@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Array based storage for Resumes
@@ -40,12 +41,9 @@ public class ArrayStorage {
 
     void delete(String uuid) {
         int index = getResumeIndex(uuid);
-        int size = size();
         if (index != -1) {
             storage[index] = null;
-            for (int i = index; i < size; i++) {
-                storage[i] = storage[i + 1];
-            }
+            storage = Arrays.stream(storage).filter(Objects::nonNull).toArray(Resume[]::new);
         }
     }
 
