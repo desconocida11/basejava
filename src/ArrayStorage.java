@@ -51,17 +51,7 @@ public class ArrayStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     Resume[] getAll() {
-        int storageLength = size();
-        Resume[] allResume = new Resume[storageLength];
-        int ind = 0;
-        for (Resume r : storage) {
-            if (r != null) {
-                allResume[ind++] = r;
-            } else {
-                break;
-            }
-        }
-        return allResume;
+        return Arrays.stream(storage).filter(Objects::nonNull).toArray(Resume[]::new);
     }
 
     int size() {
