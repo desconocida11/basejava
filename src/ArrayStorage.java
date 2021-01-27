@@ -55,14 +55,6 @@ public class ArrayStorage {
     }
 
     int size() {
-        int storageLength = 0;
-        for (Resume r : storage) {
-            if (r != null) {
-                storageLength++;
-            } else {
-                break;
-            }
-        }
-        return storageLength;
+        return (int) Arrays.stream(storage).filter(Objects::nonNull).count();
     }
 }
