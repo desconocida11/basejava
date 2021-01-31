@@ -18,10 +18,11 @@ public class ArrayStorage {
     }
 
     public void save(Resume resume) {
-        if (getIndex(resume.getUuid()) != -1) {
-            System.out.printf("Резюме %s уже существует.\n", resume.getUuid());
+        String uuid = resume.getUuid();
+        if (getIndex(uuid) != -1) {
+            System.out.printf("Резюме %s уже существует.\n", uuid);
         } else if (size == STORAGE_SIZE) {
-            System.out.printf("Невозможно добавить резюме %s: хранилище заполнено.\n", resume.getUuid());
+            System.out.printf("Невозможно добавить резюме %s: хранилище заполнено.\n", uuid);
         } else {
             storage[size++] = resume;
         }
@@ -31,9 +32,8 @@ public class ArrayStorage {
         int index = getIndex(uuid);
         if (index != -1) {
             return storage[index];
-        } else {
-            System.out.printf("Резюме с uuid %s отсутствует в хранилище.\n", uuid);
         }
+        System.out.printf("Резюме с uuid %s отсутствует в хранилище.\n", uuid);
         return null;
     }
 
