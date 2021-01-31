@@ -1,3 +1,5 @@
+package com.basejava.webapp.storage;
+
 import com.basejava.webapp.model.Resume;
 
 import java.util.Arrays;
@@ -16,14 +18,15 @@ public class ArrayStorage {
     }
 
     public void save(Resume r) {
-        if (get(r.toString()) == null) {
+        int index = getResumeIndex(r.toString());
+        if (index == -1) {
             if (size == STORAGE_SIZE) {
-                System.out.printf("Невозможно добавить резюме с uuid %s: хранилище заполнено.", r.toString());
+                System.out.printf("Невозможно добавить резюме %s: хранилище заполнено.\n", r.toString());
             } else {
                 storage[size++] = r;
             }
         } else {
-            System.out.printf("Резюме с uuid %s уже существует.", r.toString());
+            System.out.printf("Резюме %s уже существует.\n", r.toString());
         }
     }
 
@@ -44,7 +47,7 @@ public class ArrayStorage {
         if (index != -1) {
             resume = storage[index];
         } else {
-            System.out.printf("Резюме с uuid %s отсутствует в хранилище.", uuid);
+            System.out.printf("Резюме с uuid %s отсутствует в хранилище.\n", uuid);
         }
         return resume;
     }
@@ -52,22 +55,20 @@ public class ArrayStorage {
     public void delete(String uuid) {
         int index = getResumeIndex(uuid);
         if (index != -1) {
-            storage[index] = null;
-            int length = size - (index + 1);
-            if (length >= 0) {
-                System.arraycopy(storage, index + 1, storage, index, length);
-            }
+            storage[index] = storage[size - 1];
             storage[size - 1] = null;
             size--;
+        } else {
+            System.out.printf("Резюме с uuid %s отсутствует в хранилище.\n", uuid);
         }
     }
 
-    public void update(String uuid) {
-        int index = getResumeIndex(uuid);
+    public void update(Resume r) {
+        int index = getResumeIndex(r.getUuid());
         if (index != -1) {
-            storage[index].setUuid(uuid);
+            storage[index].setUuid(r.getUuid());
         } else {
-            System.out.printf("Резюме с uuid %s отсутствует в хранилище.", uuid);
+            System.out.printf("Резюме с uuid %s отсутствует в хранилище.\n", r.toString());
         }
     }
 
