@@ -1,5 +1,8 @@
 package com.basejava.webapp.storage;
 
+import com.basejava.webapp.exception.ResumeExistsStorageException;
+import com.basejava.webapp.exception.ResumeNotExistsStorageException;
+import com.basejava.webapp.exception.StorageException;
 import com.basejava.webapp.model.Resume;
 
 import java.util.Arrays;
@@ -19,17 +22,16 @@ public abstract class AbstractArrayStorage implements Storage {
 
     public Resume get(String uuid) {
         int index = getIndex(uuid);
-        if (index != -1) {
+        if (index >= 0) {
             return storage[index];
         }
-        System.out.printf("Резюме с uuid %s отсутствует в хранилище.\n", uuid);
-        return null;
+        throw new ResumeNotExistsStorageException(uuid);
     }
 
     public void update(Resume resume) {
         int index = getIndex(resume.getUuid());
-        if (index == -1) {
-            System.out.printf("Резюме с uuid %s отсутствует в хранилище.\n", resume.getUuid());
+        if (index < 0) {
+            throw new ResumeNotExistsStorageException(resume.getUuid());
         } else {
             storage[index] = resume;
         }
@@ -39,9 +41,9 @@ public abstract class AbstractArrayStorage implements Storage {
         String uuid = resume.getUuid();
         int index = getIndex(uuid);
         if (index >= 0) {
-            System.out.printf("Резюме %s уже существует.\n", uuid);
+            throw new ResumeExistsStorageException(uuid);
         } else if (size == STORAGE_SIZE) {
-            System.out.printf("Невозможно добавить резюме %s: хранилище заполнено.\n", uuid);
+            throw new StorageException("Storage overflow", uuid);
         } else {
             saveIndex(index, resume);
             size++;
@@ -53,7 +55,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public void delete(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
-            System.out.printf("Резюме с uuid %s отсутствует в хранилище.\n", uuid);
+            throw new ResumeNotExistsStorageException(uuid);
         } else {
             deleteIndex(index, uuid);
             storage[size - 1] = null;
