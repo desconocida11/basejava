@@ -45,7 +45,7 @@ public abstract class AbstractArrayStorage implements Storage {
         } else if (size == STORAGE_SIZE) {
             throw new StorageException("Storage overflow", uuid);
         } else {
-            saveIndex(index, resume);
+            insertResume(index, resume);
             size++;
         }
     }
@@ -57,7 +57,7 @@ public abstract class AbstractArrayStorage implements Storage {
         if (index < 0) {
             throw new ResumeNotExistsStorageException(uuid);
         } else {
-            deleteIndex(index, uuid);
+            fillDeletedResume(index, uuid);
             storage[size - 1] = null;
             size--;
         }
