@@ -8,7 +8,7 @@ import com.basejava.webapp.model.Resume;
 import java.util.Arrays;
 
 /**
- * Array based storage for Resumes
+ * Array based abstract storage for Resumes
  */
 public abstract class AbstractArrayStorage implements Storage {
     public static final int STORAGE_SIZE = 10_000;

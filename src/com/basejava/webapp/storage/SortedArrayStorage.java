@@ -15,9 +15,10 @@ public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
     protected void fillDeletedResume(int index, String uuid) {
-        int length = size - (index + 1);
+        int resumePosition = index + 1;
+        int length = size - resumePosition;
         if (length > 0) {
-            System.arraycopy(storage, index + 1, storage, index, length);
+            System.arraycopy(storage, resumePosition, storage, index, length);
         }
     }
 
