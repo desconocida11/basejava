@@ -50,8 +50,6 @@ public abstract class AbstractArrayStorage implements Storage {
         }
     }
 
-    protected abstract void saveIndex(int index, Resume resume);
-
     public void delete(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
@@ -63,10 +61,6 @@ public abstract class AbstractArrayStorage implements Storage {
         }
     }
 
-    protected abstract void deleteIndex(int index, String uuid);
-
-    protected abstract int getIndex(String uuid);
-
     /**
      * @return array, contains only Resumes in storage (without null)
      */
@@ -77,4 +71,10 @@ public abstract class AbstractArrayStorage implements Storage {
     public int size() {
         return size;
     }
+
+    protected abstract void insertResume(int index, Resume resume);
+
+    protected abstract void fillDeletedResume(int index, String uuid);
+
+    protected abstract int getIndex(String uuid);
 }
