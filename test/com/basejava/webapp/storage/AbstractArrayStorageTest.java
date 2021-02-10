@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
 import static com.basejava.webapp.storage.AbstractArrayStorage.STORAGE_SIZE;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,6 +66,7 @@ abstract class AbstractArrayStorageTest {
         Resume newResume = new Resume(UUID_4);
         storage.save(newResume);
         assertEquals(4, storage.size());
+        assertEquals(newResume, storage.get(UUID_4));
     }
 
     @Test
@@ -91,6 +90,7 @@ abstract class AbstractArrayStorageTest {
     void delete() {
         storage.delete(UUID_1);
         assertEquals(2, storage.size());
+        assertThrows(ResumeNotExistsStorageException.class, () -> storage.get(UUID_1));
     }
 
     @Test
@@ -105,8 +105,7 @@ abstract class AbstractArrayStorageTest {
         expectedResumes[1] = new Resume(UUID_2);
         expectedResumes[2] = new Resume(UUID_3);
         Resume[] getResumes = storage.getAll();
-        Arrays.sort(getResumes);
-        assertTrue(Arrays.equals(expectedResumes, getResumes));
+        assertArrayEquals(expectedResumes, getResumes);
     }
 
     @Test
