@@ -1,70 +1,61 @@
 package com.basejava.webapp.storage;
 
-import com.basejava.webapp.exception.ResumeExistsStorageException;
-import com.basejava.webapp.exception.ResumeNotExistsStorageException;
 import com.basejava.webapp.exception.StorageException;
 import com.basejava.webapp.model.Resume;
 
 import java.util.Arrays;
 
+<<<<<<< HEAD
 public abstract class AbstractArrayStorage implements Storage {
     public static final int STORAGE_SIZE = 10_000;
+=======
+public abstract class AbstractArrayStorage extends AbstractStorage {
+    protected static final int STORAGE_SIZE = 10_000;
+>>>>>>> HW05
     protected Resume[] storage = new Resume[STORAGE_SIZE];
     protected int size = 0;
 
+    @Override
     public void clear() {
         Arrays.fill(storage, 0, size, null);
         size = 0;
     }
 
-    public Resume get(String uuid) {
-        int index = getIndex(uuid);
-        if (index >= 0) {
-            return storage[index];
-        }
-        throw new ResumeNotExistsStorageException(uuid);
+    @Override
+    protected Resume getResumeByIndex(int index) {
+        return storage[index];
     }
 
-    public void update(Resume resume) {
-        int index = getIndex(resume.getUuid());
-        if (index < 0) {
-            throw new ResumeNotExistsStorageException(resume.getUuid());
-        } else {
-            storage[index] = resume;
-        }
+    @Override
+    protected void fillUpdatedResume(int index, Resume resume) {
+        storage[index] = resume;
     }
 
-    public void save(Resume resume) {
-        String uuid = resume.getUuid();
-        int index = getIndex(uuid);
-        if (index >= 0) {
-            throw new ResumeExistsStorageException(uuid);
-        } else if (size == STORAGE_SIZE) {
+    @Override
+    protected void saveResume(Resume resume, String uuid, int index) {
+        if (size == STORAGE_SIZE) {
             throw new StorageException("Storage overflow", uuid);
-        } else {
-            insertResume(index, resume);
-            size++;
         }
+        insertResume(index, resume);
+        size++;
     }
 
-    public void delete(String uuid) {
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new ResumeNotExistsStorageException(uuid);
-        } else {
-            fillDeletedResume(index, uuid);
-            storage[size - 1] = null;
-            size--;
-        }
+    @Override
+    protected void deleteResume(String uuid, int index) {
+        fillDeletedResume(index, uuid);
+        storage[size - 1] = null;
+        size--;
     }
 
     /**
      * @return array, contains only Resumes in storage (without null)
      */
+    @Override
     public Resume[] getAll() {
         return Arrays.stream(storage, 0, size).toArray(Resume[]::new);
     }
 
+    @Override
     public int size() {
         return size;
     }

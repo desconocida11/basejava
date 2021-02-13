@@ -2,6 +2,7 @@
 out
 lesson
 .gradle
+lib
 *.iml
 log
 
