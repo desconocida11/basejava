@@ -1,18 +1,20 @@
 package com.basejava.webapp.storage;
 
+import com.basejava.webapp.exception.ResumeExistsStorageException;
+import com.basejava.webapp.exception.ResumeNotExistsStorageException;
 import com.basejava.webapp.exception.StorageException;
 import com.basejava.webapp.model.Resume;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.basejava.webapp.storage.AbstractArrayStorage.STORAGE_SIZE;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractArrayStorageTest extends AbstractStorageTest {
 
     public AbstractArrayStorageTest(Storage storage) {
-<<<<<<< HEAD
-        this.storage = storage;
+        super(storage);
     }
 
     @BeforeEach
@@ -58,9 +60,7 @@ abstract class AbstractArrayStorageTest extends AbstractStorageTest {
         storage.save(newResume);
         assertEquals(4, storage.size());
         assertEquals(newResume, storage.get(UUID_4));
-=======
-        super(storage);
->>>>>>> HW05
+//        super(storage);
     }
 
     @Test
@@ -75,7 +75,6 @@ abstract class AbstractArrayStorageTest extends AbstractStorageTest {
         assertThrows(StorageException.class, () -> storage.save(new Resume()));
     }
 
-<<<<<<< HEAD
     @Test
     void saveAlreadyExists() {
         assertThrows(ResumeExistsStorageException.class, () -> storage.save(new Resume(UUID_2)));
@@ -107,7 +106,4 @@ abstract class AbstractArrayStorageTest extends AbstractStorageTest {
     void size() {
         assertEquals(3, storage.size());
     }
-
-=======
->>>>>>> HW05
 }
