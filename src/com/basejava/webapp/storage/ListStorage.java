@@ -3,10 +3,11 @@ package com.basejava.webapp.storage;
 import com.basejava.webapp.model.Resume;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ListStorage extends AbstractStorage {
 
-    protected final ArrayList<Resume> storage = new ArrayList<>();
+    private final List<Resume> storage = new ArrayList<>();
 
     @Override
     public void clear() {
@@ -14,7 +15,7 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void saveResume(Resume resume, String uuid, int index) {
+    protected void saveResume(Resume resume, int index) {
         storage.add(resume);
     }
 
@@ -24,7 +25,7 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void deleteResume(String uuid, int index) {
+    protected void deleteResume(int index) {
         storage.remove(index);
     }
 
