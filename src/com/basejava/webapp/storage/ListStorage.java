@@ -15,12 +15,12 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected boolean resumeExists(Object searchKey) {
-        return (int) searchKey >= 0;
+    protected boolean resumeExists(Object index) {
+        return (int) index >= 0;
     }
 
     @Override
-    protected Object getResumeKey(String uuid) {
+    protected Object getSearchKey(String uuid) {
         return storage.indexOf(new Resume(uuid));
     }
 
@@ -30,13 +30,13 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void deleteResume(Object searchKey) {
-        storage.remove((int) searchKey);
+    protected void deleteResume(Object index) {
+        storage.remove((int) index);
     }
 
     @Override
-    protected Resume getResume(Object searchKey) {
-        return storage.get((Integer) searchKey);
+    protected Resume getResume(Object index) {
+        return storage.get((int) index);
     }
 
     @Override
@@ -50,12 +50,7 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected int getIndex(String uuid) {
-        return storage.indexOf(new Resume(uuid));
-    }
-
-    @Override
-    protected void fillUpdatedResume(Object searchKey, Resume resume) {
-        storage.set((Integer) searchKey, resume);
+    protected void fillUpdatedResume(Object index, Resume resume) {
+        storage.set((int) index, resume);
     }
 }
