@@ -15,12 +15,12 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected boolean resumeExists(Object index) {
+    protected boolean isResumeExist(Object index) {
         return (int) index >= 0;
     }
 
     @Override
-    protected Object getSearchKey(String uuid) {
+    protected Integer getSearchKey(String uuid) {
         return storage.indexOf(new Resume(uuid));
     }
 

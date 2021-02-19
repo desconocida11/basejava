@@ -10,12 +10,12 @@ public class MapStorage extends AbstractStorage {
     private final Map<String, Resume> storage = new HashMap<>();
 
     @Override
-    protected boolean resumeExists(Object searchKey) {
+    protected boolean isResumeExist(Object searchKey) {
         return searchKey != null;
     }
 
     @Override
-    protected Object getSearchKey(String uuid) {
+    protected String getSearchKey(String uuid) {
         return storage.containsKey(uuid) ? uuid : null;
     }
 

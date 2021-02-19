@@ -6,7 +6,7 @@ import com.basejava.webapp.model.Resume;
 
 public abstract class AbstractStorage implements Storage {
 
-    protected abstract boolean resumeExists(Object searchKey);
+    protected abstract boolean isResumeExist(Object searchKey);
 
     protected abstract Object getSearchKey(String uuid);
 
@@ -20,37 +20,40 @@ public abstract class AbstractStorage implements Storage {
 
     public void save(Resume resume) {
         String uuid = resume.getUuid();
-        Object searchKey = getSearchKey(uuid);
-        if (resumeExists(searchKey)) {
-            throw new ResumeExistsStorageException(uuid);
-        }
+        Object searchKey = getNotExistedSearchKey(uuid);
         saveResume(resume, searchKey);
     }
 
     public Resume get(String uuid) {
-        Object searchKey = getSearchKey(uuid);
-        notExistException(uuid, searchKey);
+        Object searchKey = getExistedSearchKey(uuid);
         return getResume(searchKey);
     }
 
     @Override
     public void delete(String uuid) {
-        Object searchKey = getSearchKey(uuid);
-        notExistException(uuid, searchKey);
+        Object searchKey = getExistedSearchKey(uuid);
         deleteResume(searchKey);
     }
 
     public void update(Resume resume) {
         String uuid = resume.getUuid();
-        Object searchKey = getSearchKey(uuid);
-        notExistException(uuid, searchKey);
+        Object searchKey = getExistedSearchKey(uuid);
         fillUpdatedResume(searchKey, resume);
     }
 
-    private void notExistException(String uuid, Object searchKey) {
-        if (!resumeExists(searchKey)) {
+    private Object getExistedSearchKey(String uuid) {
+        Object searchKey = getSearchKey(uuid);
+        if (!isResumeExist(searchKey)) {
             throw new ResumeNotExistsStorageException(uuid);
         }
+        return searchKey;
     }
 
+    private Object getNotExistedSearchKey(String uuid) {
+        Object searchKey = getSearchKey(uuid);
+        if (isResumeExist(searchKey)) {
+            throw new ResumeExistsStorageException(uuid);
+        }
+        return searchKey;
+    }
 }
