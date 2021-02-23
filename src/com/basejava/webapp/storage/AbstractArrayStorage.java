@@ -4,6 +4,8 @@ import com.basejava.webapp.exception.StorageException;
 import com.basejava.webapp.model.Resume;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class AbstractArrayStorage extends AbstractStorage {
     protected static final int STORAGE_SIZE = 10_000;
@@ -47,12 +49,9 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         size--;
     }
 
-    /**
-     * @return array, contains only Resumes in storage (without null)
-     */
     @Override
-    public Resume[] getAll() {
-        return Arrays.stream(storage, 0, size).toArray(Resume[]::new);
+    public List<Resume> getAllSorted() {
+        return Arrays.stream(storage, 0, size).sorted(Resume.RESUME_FULL_NAME_COMPARATOR).collect(Collectors.toList());
     }
 
     @Override

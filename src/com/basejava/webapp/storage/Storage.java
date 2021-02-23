@@ -2,6 +2,8 @@ package com.basejava.webapp.storage;
 
 import com.basejava.webapp.model.Resume;
 
+import java.util.List;
+
 /**
  * Array based storage interface for Resumes
  */
@@ -16,10 +18,7 @@ public interface Storage {
 
     void update(Resume resume);
 
-    /**
-     * @return array, contains only Resumes in storage (without null)
-     */
-    Resume[] getAll();
+    List<Resume> getAllSorted();
 
     int size();
 }

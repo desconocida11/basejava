@@ -4,6 +4,8 @@ import com.basejava.webapp.model.Resume;
 
 import java.util.Arrays;
 
+import static com.basejava.webapp.model.Resume.RESUME_UUID_COMPARATOR;
+
 public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
@@ -23,7 +25,7 @@ public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
     protected Integer getSearchKey(String uuid) {
-        Resume searchKey = new Resume(uuid);
-        return Arrays.binarySearch(storage, 0, size, searchKey);
+        Resume searchKey = new Resume(uuid, "dummy name");
+        return Arrays.binarySearch(storage, 0, size, searchKey, RESUME_UUID_COMPARATOR);
     }
 }
