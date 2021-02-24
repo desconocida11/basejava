@@ -50,8 +50,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        return Arrays.stream(storage, 0, size).sorted(Resume.RESUME_FULL_NAME_COMPARATOR).collect(Collectors.toList());
+    public List<Resume> getResumeList() {
+        return Arrays.stream(storage, 0, size).collect(Collectors.toList());
     }
 
     @Override

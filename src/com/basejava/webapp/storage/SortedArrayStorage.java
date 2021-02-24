@@ -3,10 +3,11 @@ package com.basejava.webapp.storage;
 import com.basejava.webapp.model.Resume;
 
 import java.util.Arrays;
-
-import static com.basejava.webapp.model.Resume.RESUME_UUID_COMPARATOR;
+import java.util.Comparator;
 
 public class SortedArrayStorage extends AbstractArrayStorage {
+
+    public static final Comparator<Resume> RESUME_UUID_COMPARATOR = (resume, t1) -> t1.getUuid().compareTo(resume.getUuid());
 
     @Override
     protected void insertResume(Resume resume, int index) {

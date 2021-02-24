@@ -27,7 +27,6 @@ public class ListStorage extends AbstractStorage {
             }
         }
         return -1;
-//        return storage.indexOf(new Resume(uuid, fullName));
     }
 
     @Override
@@ -46,10 +45,8 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        List<Resume> sortedList = storage;
-        sortedList.sort(Resume.RESUME_FULL_NAME_COMPARATOR);
-        return sortedList;
+    public List<Resume> getResumeList() {
+        return storage;
     }
 
     @Override
