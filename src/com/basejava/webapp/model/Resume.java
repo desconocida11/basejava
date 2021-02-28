@@ -1,5 +1,7 @@
 package com.basejava.webapp.model;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -13,11 +15,16 @@ public class Resume {
 
     private final String fullName;
 
+    private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
+    private final Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
+
     public Resume(String fullName) {
         this(UUID.randomUUID().toString(), fullName);
     }
 
     public Resume(String uuid, String fullName) {
+        Objects.requireNonNull(uuid, "uuid can't be null");
+        Objects.requireNonNull(fullName, "full name can't be null");
         this.uuid = uuid;
         this.fullName = fullName;
     }
@@ -46,6 +53,30 @@ public class Resume {
     @Override
     public String toString() {
         return uuid;
+    }
+
+    public Map<ContactType, String> getAllContacts() {
+        return contacts;
+    }
+
+    public Map<SectionType, AbstractSection> getAllSections() {
+        return sections;
+    }
+
+    public String getContactByType (ContactType type) {
+        return this.contacts.get(type);
+    }
+
+    public AbstractSection getSectionByType (SectionType type) {
+        return this.sections.get(type);
+    }
+
+    public void addContact(ContactType type, String contact) {
+        this.contacts.put(type, contact);
+    }
+
+    public void addSection(SectionType type, AbstractSection section) {
+        this.sections.put(type, section);
     }
 
 }
