@@ -37,6 +37,30 @@ public class Resume {
         return fullName;
     }
 
+    public Map<ContactType, String> getAllContacts() {
+        return contacts;
+    }
+
+    public Map<SectionType, AbstractSection> getAllSections() {
+        return sections;
+    }
+
+    public String getContactByType (ContactType type) {
+        return contacts.get(type);
+    }
+
+    public AbstractSection getSectionByType (SectionType type) {
+        return sections.get(type);
+    }
+
+    public void addContact(ContactType type, String contact) {
+        contacts.put(type, contact);
+    }
+
+    public void addSection(SectionType type, AbstractSection section) {
+        sections.put(type, section);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -54,29 +78,4 @@ public class Resume {
     public String toString() {
         return uuid;
     }
-
-    public Map<ContactType, String> getAllContacts() {
-        return contacts;
-    }
-
-    public Map<SectionType, AbstractSection> getAllSections() {
-        return sections;
-    }
-
-    public String getContactByType (ContactType type) {
-        return this.contacts.get(type);
-    }
-
-    public AbstractSection getSectionByType (SectionType type) {
-        return this.sections.get(type);
-    }
-
-    public void addContact(ContactType type, String contact) {
-        this.contacts.put(type, contact);
-    }
-
-    public void addSection(SectionType type, AbstractSection section) {
-        this.sections.put(type, section);
-    }
-
 }

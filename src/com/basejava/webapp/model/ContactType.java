@@ -7,7 +7,8 @@ public enum ContactType {
     EMAIL("Почта"),
     LINKEDIN("LinkedIn"),
     GITHUB("GitHub"),
-    TELEGRAM("Телеграм");
+    STACKOVERFLOW("StackOverflow"),
+    SITE("Домашняя страница");
 
     private final String type;
 
