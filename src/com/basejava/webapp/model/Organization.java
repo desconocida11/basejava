@@ -25,7 +25,7 @@ public class Organization extends AbstractSection {
         StringBuilder sb = new StringBuilder();
         List<Experience> sortedValue = value;
         sortedValue.sort(EXPERIENCE_PERIOD_COMPARATOR);
-        for (Experience c: sortedValue ) {
+        for (Experience c : sortedValue) {
             sb.append(c).append(", \n");
         }
         return sb.toString();

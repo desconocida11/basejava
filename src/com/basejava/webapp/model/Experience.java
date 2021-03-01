@@ -12,7 +12,7 @@ public class Experience {
     private final String organization;
     private final String value;
 
-    public Experience (String startDate, String endDate, String organization, String value) {
+    public Experience(String startDate, String endDate, String organization, String value) {
         this(LocalDate.parse("01/" + startDate, formatter), LocalDate.parse("01/" + endDate, formatter), organization, value);
     }
 
@@ -38,6 +38,6 @@ public class Experience {
     @Override
     public String toString() {
         return startDate.format(DateTimeFormatter.ofPattern("MM/yyyy")) + " - " + endDate.format(DateTimeFormatter.ofPattern("MM/yyyy")) + ", " + organization +
-                ", " + value ;
+                ", " + value;
     }
 }

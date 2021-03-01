@@ -45,11 +45,11 @@ public class Resume {
         return sections;
     }
 
-    public String getContactByType (ContactType type) {
+    public String getContactByType(ContactType type) {
         return contacts.get(type);
     }
 
-    public AbstractSection getSectionByType (SectionType type) {
+    public AbstractSection getSectionByType(SectionType type) {
         return sections.get(type);
     }
 

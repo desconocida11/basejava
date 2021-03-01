@@ -20,7 +20,7 @@ public class BulletedListSection extends AbstractSection {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (String s: value ) {
+        for (String s : value) {
             sb.append(s).append(", \n");
         }
         return sb.toString();
