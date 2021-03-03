@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.basejava.webapp.ResumeTestData.createResume;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -27,9 +28,9 @@ abstract class AbstractStorageTest {
     @BeforeEach
     void setUp() {
         storage.clear();
-        storage.save(new Resume(UUID_1, "John Dorian"));
-        storage.save(new Resume(UUID_2, "Ivan Petrov"));
-        storage.save(new Resume(UUID_3, "Petr Ivanov"));
+        storage.save(createResume(UUID_1, "John Dorian"));
+        storage.save(createResume(UUID_2, "Ivan Petrov"));
+        storage.save(createResume(UUID_3, "Petr Ivanov"));
     }
 
     @Test
@@ -40,7 +41,7 @@ abstract class AbstractStorageTest {
 
     @Test
     void get() {
-        Resume resumeExpected = new Resume(UUID_1, "John Dorian");
+        Resume resumeExpected = createResume(UUID_1, "John Dorian");
         assertEquals(resumeExpected, storage.get(UUID_1));
     }
 
@@ -51,19 +52,19 @@ abstract class AbstractStorageTest {
 
     @Test
     void update() {
-        Resume resumeToUpdate = new Resume(UUID_2, "Ivan Petrov");
+        Resume resumeToUpdate = createResume(UUID_2, "Ivan Petrov");
         storage.update(resumeToUpdate);
         assertEquals(resumeToUpdate, storage.get(UUID_2));
     }
 
     @Test
     void updateNoExists() {
-        assertThrows(ResumeNotExistsStorageException.class, () -> storage.update(new Resume(UUID_4, "Unknown Person")));
+        assertThrows(ResumeNotExistsStorageException.class, () -> storage.update(createResume(UUID_4, "Unknown Person")));
     }
 
     @Test
     void save() {
-        Resume newResume = new Resume(UUID_4, "Unknown Person");
+        Resume newResume = createResume(UUID_4, "Unknown Person");
         storage.save(newResume);
         assertSize(4);
         assertEquals(newResume, storage.get(UUID_4));
@@ -71,7 +72,7 @@ abstract class AbstractStorageTest {
 
     @Test
     void saveAlreadyExists() {
-        assertThrows(ResumeExistsStorageException.class, () -> storage.save(new Resume(UUID_2, "Ivan Petrov")));
+        assertThrows(ResumeExistsStorageException.class, () -> storage.save(createResume(UUID_2, "Ivan Petrov")));
     }
 
     @Test
@@ -88,8 +89,8 @@ abstract class AbstractStorageTest {
 
     @Test
     void getAllSorted() {
-        List<Resume> expectedResumes = Arrays.asList(new Resume(UUID_2, "Ivan Petrov"),
-                new Resume(UUID_1, "John Dorian"), new Resume(UUID_3, "Petr Ivanov"));
+        List<Resume> expectedResumes = Arrays.asList(createResume(UUID_2, "Ivan Petrov"),
+                createResume(UUID_1, "John Dorian"), createResume(UUID_3, "Petr Ivanov"));
         List<Resume> actualResumes = storage.getAllSorted();
         assertEquals(expectedResumes, actualResumes);
     }

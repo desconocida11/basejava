@@ -1,43 +1,41 @@
 package com.basejava.webapp.model;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
 
 public class Experience {
 
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+    private final Link organization;
+    private final List<OrganizationPeriod> periods;
 
-    private final LocalDate startDate;
-    private final LocalDate endDate;
-    private final String organization;
-    private final String value;
-
-    public Experience(String startDate, String endDate, String organization, String value) {
-        this(LocalDate.parse("01/" + startDate, formatter), LocalDate.parse("01/" + endDate, formatter), organization, value);
-    }
-
-    public Experience(LocalDate startDate, LocalDate endDate, String organization, String value) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public Experience(Link organization, List<OrganizationPeriod> periods) {
         this.organization = organization;
-        this.value = value;
+        this.periods = periods;
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
+    public Link getOrganization() {
+        return organization;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public List<OrganizationPeriod> getPeriods() {
+        return periods;
     }
 
-    private boolean isPeriodValid(LocalDate startDate, LocalDate endDate) {
-        return endDate.isAfter(startDate);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Experience that = (Experience) o;
+        return organization.equals(that.organization) && periods.equals(that.periods);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(organization, periods);
     }
 
     @Override
     public String toString() {
-        return startDate.format(DateTimeFormatter.ofPattern("MM/yyyy")) + " - " + endDate.format(DateTimeFormatter.ofPattern("MM/yyyy")) + ", " + organization +
-                ", " + value;
+        return periods.toString() + ": " + organization.toString() + "\n";
     }
 }

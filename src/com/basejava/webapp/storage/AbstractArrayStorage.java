@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class AbstractArrayStorage extends AbstractStorage {
+public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
     protected static final int STORAGE_SIZE = 10_000;
     protected Resume[] storage = new Resume[STORAGE_SIZE];
     protected int size = 0;
@@ -19,22 +19,22 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected boolean isResumeExist(Object index) {
+    protected boolean isResumeExist(Integer index) {
         return (int) index >= 0;
     }
 
     @Override
-    protected Resume getResume(Object index) {
+    protected Resume getResume(Integer index) {
         return storage[(int) index];
     }
 
     @Override
-    protected void fillUpdatedResume(Object index, Resume resume) {
+    protected void fillUpdatedResume(Integer index, Resume resume) {
         storage[(int) index] = resume;
     }
 
     @Override
-    protected void saveResume(Resume resume, Object index) {
+    protected void saveResume(Resume resume, Integer index) {
         if (size == STORAGE_SIZE) {
             throw new StorageException("Storage overflow", resume.getUuid());
         }
@@ -43,7 +43,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected void deleteResume(Object index) {
+    protected void deleteResume(Integer index) {
         fillDeletedResume((int) index);
         storage[size - 1] = null;
         size--;
