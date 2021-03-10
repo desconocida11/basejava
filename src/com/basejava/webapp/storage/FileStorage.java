@@ -5,16 +5,17 @@ import com.basejava.webapp.model.Resume;
 import com.basejava.webapp.storage.serializer.Serializer;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class AbstractFileStorage extends AbstractStorage<File> {
+public class FileStorage extends AbstractStorage<File> {
 
     private final File directory;
 
     protected final Serializer serializerStrategy;
 
-    protected AbstractFileStorage(String dir, Serializer serializerStrategy) {
+    protected FileStorage(String dir, Serializer serializerStrategy) {
         this.serializerStrategy = serializerStrategy;
         this.directory = new File(dir);
         Objects.requireNonNull(directory, "directory must not be null");
@@ -81,7 +82,14 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         return doGetResumeList(listFiles);
     }
 
-    protected abstract List<Resume> doGetResumeList(File[] listFiles);
+
+    protected List<Resume> doGetResumeList(File[] listFiles) {
+        List<Resume> resumeList = new ArrayList<>();
+        for (File f : listFiles) {
+            resumeList.add(getResume(f));
+        }
+        return resumeList;
+    }
 
     @Override
     public void clear() {

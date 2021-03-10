@@ -9,16 +9,17 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-abstract public class AbstractPathStorage extends AbstractStorage<Path> {
+public class PathStorage extends AbstractStorage<Path> {
 
     private final Path directory;
 
     protected final Serializer serializerStrategy;
 
-    protected AbstractPathStorage(String dir, Serializer serializerStrategy) {
+    protected PathStorage(String dir, Serializer serializerStrategy) {
         this.serializerStrategy = serializerStrategy;
         directory = Paths.get(dir);
         Objects.requireNonNull(directory, "directory must not be null");
@@ -83,17 +84,23 @@ abstract public class AbstractPathStorage extends AbstractStorage<Path> {
         try {
             listPaths = Files.list(directory).toArray(Path[]::new);
             return doGetResumeList(listPaths);
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             throw new StorageException("Directory read error", null, e);
         }
     }
 
-    protected abstract List<Resume> doGetResumeList(Path[] listPaths) throws IOException, ClassNotFoundException;
+    protected List<Resume> doGetResumeList(Path[] listPaths) {
+        List<Resume> out = new ArrayList<>();
+        for (Path path : listPaths) {
+            out.add(getResume(path));
+        }
+        return out;
+    }
 
     @Override
     public void clear() {
         try {
-            Files.list(directory).forEach((this::deleteResume));
+            Files.list(directory).forEach(this::deleteResume);
         } catch (IOException e) {
             throw new StorageException("Directory clear error", null, e);
         }
