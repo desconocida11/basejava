@@ -2,6 +2,7 @@ package com.basejava.webapp.storage;
 
 import com.basejava.webapp.exception.StorageException;
 import com.basejava.webapp.model.Resume;
+import com.basejava.webapp.storage.serializer.Serializer;
 
 import java.io.*;
 import java.util.List;
@@ -11,7 +12,11 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     private final File directory;
 
-    protected AbstractFileStorage(File directory) {
+    protected final Serializer serializerStrategy;
+
+    protected AbstractFileStorage(String dir, Serializer serializerStrategy) {
+        this.serializerStrategy = serializerStrategy;
+        this.directory = new File(dir);
         Objects.requireNonNull(directory, "directory must not be null");
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not directory");
@@ -19,7 +24,6 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         if (!directory.canRead() || !directory.canWrite()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not readable/writable");
         }
-        this.directory = directory;
     }
 
     @Override
@@ -43,8 +47,6 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         fillUpdatedResume(file, resume);
     }
 
-    protected abstract void doWrite(Resume resume, OutputStream outputStream) throws IOException;
-
     @Override
     protected void deleteResume(File file) {
         if (!file.delete()) {
@@ -55,18 +57,16 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     protected Resume getResume(File file) {
         try {
-            return doRead(new BufferedInputStream(new FileInputStream(file)));
+            return serializerStrategy.doRead(new BufferedInputStream(new FileInputStream(file)));
         } catch (IOException e) {
             throw new StorageException("Can't read file" + file.getAbsolutePath(), file.getName(), e);
         }
     }
 
-    protected abstract Resume doRead(InputStream inputStream) throws IOException;
-
     @Override
     protected void fillUpdatedResume(File file, Resume resume) {
         try {
-            doWrite(resume, new BufferedOutputStream(new FileOutputStream(file)));
+            serializerStrategy.doWrite(resume, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (IOException e) {
             throw new StorageException("Update Error", file.getName(), e);
         }
