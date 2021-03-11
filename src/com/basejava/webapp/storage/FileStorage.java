@@ -76,29 +76,26 @@ public class FileStorage extends AbstractStorage<File> {
 
     @Override
     protected List<Resume> getResumeList() {
-        File[] listFiles = directory.listFiles();
-        if (listFiles == null) {
-            throw new StorageException("Directory read error", null);
-        }
-        return Arrays.stream(listFiles).map(this::getResume).collect(Collectors.toList());
+        return Arrays.stream(getDirFiles()).map(this::getResume).collect(Collectors.toList());
     }
 
     @Override
     public void clear() {
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                deleteResume(f);
-            }
+        for (File f : getDirFiles()) {
+            deleteResume(f);
         }
     }
 
     @Override
     public int size() {
-        final String[] list = directory.list();
+        return getDirFiles().length;
+    }
+
+    private File[] getDirFiles() {
+        final File[] list = directory.listFiles();
         if (list == null) {
             throw new StorageException("Directory read error", null);
         }
-        return list.length;
+        return list;
     }
 }
