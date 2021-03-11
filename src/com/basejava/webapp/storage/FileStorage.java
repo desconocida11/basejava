@@ -5,9 +5,10 @@ import com.basejava.webapp.model.Resume;
 import com.basejava.webapp.storage.serializer.Serializer;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class FileStorage extends AbstractStorage<File> {
 
@@ -79,16 +80,7 @@ public class FileStorage extends AbstractStorage<File> {
         if (listFiles == null) {
             throw new StorageException("Directory read error", null);
         }
-        return doGetResumeList(listFiles);
-    }
-
-
-    protected List<Resume> doGetResumeList(File[] listFiles) {
-        List<Resume> resumeList = new ArrayList<>();
-        for (File f : listFiles) {
-            resumeList.add(getResume(f));
-        }
-        return resumeList;
+        return Arrays.stream(listFiles).map(this::getResume).collect(Collectors.toList());
     }
 
     @Override
