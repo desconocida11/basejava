@@ -5,11 +5,14 @@ import java.util.Objects;
 
 public class OrganizationSection extends AbstractSection {
 
-    private final List<Organization> value;
+    private List<Organization> value;
 
     public OrganizationSection(List<Organization> value) {
         Objects.requireNonNull(value, "value must not be null");
         this.value = value;
+    }
+
+    public OrganizationSection() {
     }
 
     @Override

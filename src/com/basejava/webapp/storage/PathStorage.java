@@ -20,7 +20,7 @@ public class PathStorage extends AbstractStorage<Path> {
 
     private final Path directory;
 
-    protected final Serializer serializerStrategy;
+    private final Serializer serializerStrategy;
 
     protected PathStorage(String dir, Serializer serializerStrategy) {
         this.serializerStrategy = serializerStrategy;
@@ -49,7 +49,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             Files.createFile(file);
         } catch (IOException e) {
-            throw new StorageException("Can't create file" + file.getFileName().toString(), file.getFileName().toString(), e);
+            throw new StorageException("Can't create file " + getFileName(file), getFileName(file), e);
         }
         fillUpdatedResume(file, resume);
     }
@@ -59,7 +59,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             Files.delete(file);
         } catch (IOException e) {
-            throw new StorageException("Path delete error", file.getFileName().toString());
+            throw new StorageException("Path delete error", getFileName(file));
         }
     }
 
@@ -68,8 +68,12 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             return serializerStrategy.doRead(new BufferedInputStream(Files.newInputStream(file)));
         } catch (IOException e) {
-            throw new StorageException("Can't read file" + file.getFileName().toString(), file.getFileName().toString(), e);
+            throw new StorageException("Can't read file " + getFileName(file), getFileName(file), e);
         }
+    }
+
+    private String getFileName(Path file) {
+        return file.getFileName().toString();
     }
 
     @Override
@@ -77,7 +81,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             serializerStrategy.doWrite(resume, new BufferedOutputStream(Files.newOutputStream(file)));
         } catch (IOException e) {
-            throw new StorageException("Update Error", file.toString(), e);
+            throw new StorageException("Update Error", getFileName(file), e);
         }
     }
 

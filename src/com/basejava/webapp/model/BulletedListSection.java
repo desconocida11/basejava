@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class BulletedListSection extends AbstractSection {
 
-    private final List<String> value;
+    private List<String> value;
 
     public BulletedListSection(String... values) {
         this(Arrays.asList(values));
@@ -15,6 +15,9 @@ public class BulletedListSection extends AbstractSection {
     public BulletedListSection(List<String> value) {
         Objects.requireNonNull(value, "BulletedList value must not be null");
         this.value = value;
+    }
+
+    public BulletedListSection() {
     }
 
     @Override

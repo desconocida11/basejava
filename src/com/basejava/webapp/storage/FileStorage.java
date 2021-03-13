@@ -14,7 +14,7 @@ public class FileStorage extends AbstractStorage<File> {
 
     private final File directory;
 
-    protected final Serializer serializerStrategy;
+    private final Serializer serializerStrategy;
 
     protected FileStorage(String dir, Serializer serializerStrategy) {
         this.serializerStrategy = serializerStrategy;
@@ -94,7 +94,7 @@ public class FileStorage extends AbstractStorage<File> {
     private File[] getDirFiles() {
         final File[] list = directory.listFiles();
         if (list == null) {
-            throw new StorageException("Directory read error", null);
+            throw new StorageException("Directory read error");
         }
         return list;
     }

@@ -4,11 +4,14 @@ import java.util.Objects;
 
 public class SingleLineSection extends AbstractSection {
 
-    private final String value;
+    private String value;
 
     public SingleLineSection(String value) {
         Objects.requireNonNull(value, "SingleLine value must not be null");
         this.value = value;
+    }
+
+    public SingleLineSection() {
     }
 
     @Override
