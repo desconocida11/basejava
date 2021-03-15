@@ -20,6 +20,10 @@ public class BulletedListSection extends AbstractSection {
     public BulletedListSection() {
     }
 
+    public List<String> getValue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

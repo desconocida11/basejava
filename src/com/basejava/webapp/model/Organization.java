@@ -14,6 +14,7 @@ import java.util.Objects;
 public class Organization implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     private Link organization;
     private List<Experience> periods;
 
@@ -23,6 +24,14 @@ public class Organization implements Serializable {
     }
 
     public Organization() {
+    }
+
+    public Link getOrganization() {
+        return organization;
+    }
+
+    public List<Experience> getPeriods() {
+        return periods;
     }
 
     @Override
@@ -47,6 +56,7 @@ public class Organization implements Serializable {
     public static class Experience implements Serializable {
 
         private static final long serialVersionUID = 1L;
+
         @XmlJavaTypeAdapter(LocalDateAdapter.class)
         private LocalDate startDate;
         @XmlJavaTypeAdapter(LocalDateAdapter.class)
@@ -65,6 +75,18 @@ public class Organization implements Serializable {
         }
 
         public Experience() {
+        }
+
+        public LocalDate getStartDate() {
+            return startDate;
+        }
+
+        public LocalDate getEndDate() {
+            return endDate;
+        }
+
+        public String getTitle() {
+            return title;
         }
 
         private boolean isPeriodValid(LocalDate startDate, LocalDate endDate) {

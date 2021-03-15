@@ -8,6 +8,7 @@ import java.util.Objects;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Link implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private String name;
     private String url;
 
@@ -22,6 +23,14 @@ public class Link implements Serializable {
     }
 
     public Link() {
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     @Override
