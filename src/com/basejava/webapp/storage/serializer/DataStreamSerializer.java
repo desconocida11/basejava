@@ -5,10 +5,7 @@ import com.basejava.webapp.model.*;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DataStreamSerializer implements Serializer {
 
@@ -20,44 +17,42 @@ public class DataStreamSerializer implements Serializer {
             dataOutputStream.writeUTF(resume.getUuid());
             dataOutputStream.writeUTF(resume.getFullName());
             final Map<ContactType, String> allContacts = resume.getAllContacts();
-            dataOutputStream.writeInt(allContacts.size());
-            for (Map.Entry<ContactType, String> entry : allContacts.entrySet()) {
+            forEachThrowable(dataOutputStream, allContacts.entrySet(), entry -> {
                 dataOutputStream.writeUTF(entry.getKey().name());
                 dataOutputStream.writeUTF(entry.getValue());
-            }
+            });
             Set<Map.Entry<SectionType, AbstractSection>> allSections = resume.getAllSections().entrySet();
-            dataOutputStream.writeInt(allSections.size());
-            for (Map.Entry<SectionType, AbstractSection> entry : allSections) {
-                dataOutputStream.writeUTF(entry.getKey().name());
-                switch (entry.getKey()) {
+            forEachThrowable(dataOutputStream, allSections, entry -> {
+                SectionType entryKey = entry.getKey();
+                dataOutputStream.writeUTF(entryKey.name());
+                switch (entryKey) {
                     case PERSONAL:
                     case OBJECTIVE:
                         SingleLineSection singleLineSection = (SingleLineSection) entry.getValue();
-                        dataOutputStream.writeUTF(singleLineSection.toString());
+                        dataOutputStream.writeUTF(singleLineSection.getValue());
                         break;
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
                         BulletedListSection bulletedListSection = (BulletedListSection) entry.getValue();
-                        writeList(dataOutputStream, bulletedListSection.getValue());
+                        List<String> outputList = bulletedListSection.getValue();
+                        forEachThrowable(dataOutputStream, outputList, dataOutputStream::writeUTF);
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
                         OrganizationSection organizationSection = (OrganizationSection) entry.getValue();
                         List<Organization> values = organizationSection.getValue();
-                        dataOutputStream.writeInt(values.size());
-                        for (Organization value : values) {
-                            dataOutputStream.writeUTF(value.getOrganization().getName());
-                            String url = value.getOrganization().getUrl();
+
+                        forEachThrowable(dataOutputStream, values, organization -> {
+                            Link valueOrganization = organization.getOrganization();
+                            dataOutputStream.writeUTF(valueOrganization.getName());
+                            String url = valueOrganization.getUrl();
                             dataOutputStream.writeUTF(url != null ? url : " ");
-                            List<Organization.Experience> experiencePeriods = value.getPeriods();
-                            dataOutputStream.writeInt(experiencePeriods.size());
-                            for (Organization.Experience experience : experiencePeriods) {
-                                writeExperience(dataOutputStream, experience);
-                            }
-                        }
+                            List<Organization.Experience> experiencePeriods = organization.getPeriods();
+                            forEachThrowable(dataOutputStream, experiencePeriods, experience -> writeExperience(dataOutputStream, experience));
+                        });
                         break;
                 }
-            }
+            });
         }
     }
 
@@ -74,17 +69,17 @@ public class DataStreamSerializer implements Serializer {
             }
             int sizeSections = dataInputStream.readInt();
             for (int i = 0; i < sizeSections; i++) {
-                String nameSection = dataInputStream.readUTF();
-                switch (SectionType.valueOf(nameSection)) {
+                SectionType nameSection = SectionType.valueOf(dataInputStream.readUTF());
+                switch (nameSection) {
                     case PERSONAL:
                     case OBJECTIVE:
-                        resume.addSection(SectionType.valueOf(nameSection),
+                        resume.addSection(nameSection,
                                 new SingleLineSection(dataInputStream.readUTF()));
                         break;
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
                         List<String> content = readList(dataInputStream.readInt(), dataInputStream);
-                        resume.addSection(SectionType.valueOf(nameSection), new BulletedListSection(content));
+                        resume.addSection(nameSection, new BulletedListSection(content));
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
@@ -99,7 +94,7 @@ public class DataStreamSerializer implements Serializer {
                             }
                             valuesOrg.add(new Organization(link, periods));
                         }
-                        resume.addSection(SectionType.valueOf(nameSection), new OrganizationSection(valuesOrg));
+                        resume.addSection(nameSection, new OrganizationSection(valuesOrg));
                         break;
                 }
             }
@@ -110,29 +105,39 @@ public class DataStreamSerializer implements Serializer {
     private Link readLink(DataInputStream dataInputStream) throws IOException {
         String name = dataInputStream.readUTF();
         String url = dataInputStream.readUTF();
-        if (!url.equals(" ")) {
-            return new Link(name, url);
-        } else {
-            return new Link(name);
-        }
+        return url.equals(" ") ? new Link(name) : new Link(name, url);
+    }
+
+    private String formatDate(LocalDate localDate) {
+        return localDate.format(FORMATTER);
+    }
+
+    private LocalDate getDateFromString(String date) {
+        return LocalDate.from(FORMATTER.parse(date));
     }
 
     private void writeExperience(DataOutputStream dataOutputStream, Organization.Experience experience) throws IOException {
-        dataOutputStream.writeUTF(experience.getStartDate().format(FORMATTER));
-        dataOutputStream.writeUTF(experience.getEndDate().format(FORMATTER));
+        dataOutputStream.writeUTF(formatDate(experience.getStartDate()));
+        dataOutputStream.writeUTF(formatDate(experience.getEndDate()));
         dataOutputStream.writeUTF(experience.getTitle());
     }
 
-    private <T> void writeList(DataOutputStream dataOutputStream, List<T> outputList) throws IOException {
+    @FunctionalInterface
+    public interface ThrowingConsumer<T> {
+        void accept(T t) throws IOException;
+    }
+
+    private <T> void forEachThrowable(DataOutputStream dataOutputStream, Collection<T> outputList, ThrowingConsumer<T> action) throws IOException {
+        Objects.requireNonNull(action);
         dataOutputStream.writeInt(outputList.size());
-        for (T value : outputList) {
-            dataOutputStream.writeUTF((String) value);
+        for (T t : outputList) {
+            action.accept(t);
         }
     }
 
     private Organization.Experience readExperience(DataInputStream dataInputStream) throws IOException {
-        LocalDate startDate = LocalDate.from(FORMATTER.parse(dataInputStream.readUTF()));
-        LocalDate endDate = LocalDate.from(FORMATTER.parse(dataInputStream.readUTF()));
+        LocalDate startDate = getDateFromString(dataInputStream.readUTF());
+        LocalDate endDate = getDateFromString(dataInputStream.readUTF());
         String title = dataInputStream.readUTF();
         return new Organization.Experience(startDate, endDate, title);
     }

@@ -14,6 +14,10 @@ public class SingleLineSection extends AbstractSection {
     public SingleLineSection() {
     }
 
+    public String getValue() {
+        return value;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
