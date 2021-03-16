@@ -27,20 +27,16 @@ public class DataStreamSerializer implements Serializer {
                 switch (entryKey) {
                     case PERSONAL:
                     case OBJECTIVE:
-                        SingleLineSection singleLineSection = (SingleLineSection) entry.getValue();
-                        dataOutputStream.writeUTF(singleLineSection.getValue());
+                        dataOutputStream.writeUTF(((SingleLineSection) entry.getValue()).getValue());
                         break;
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
-                        BulletedListSection bulletedListSection = (BulletedListSection) entry.getValue();
-                        List<String> outputList = bulletedListSection.getValue();
+                        List<String> outputList = ((BulletedListSection) entry.getValue()).getValue();
                         forEachThrowable(dataOutputStream, outputList, dataOutputStream::writeUTF);
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
-                        OrganizationSection organizationSection = (OrganizationSection) entry.getValue();
-                        List<Organization> values = organizationSection.getValue();
-
+                        List<Organization> values = ((OrganizationSection) entry.getValue()).getValue();
                         forEachThrowable(dataOutputStream, values, organization -> {
                             Link valueOrganization = organization.getOrganization();
                             dataOutputStream.writeUTF(valueOrganization.getName());
@@ -62,12 +58,9 @@ public class DataStreamSerializer implements Serializer {
             String fullName = dataInputStream.readUTF();
             Resume resume = new Resume(uuid, fullName);
             int sizeContacts = dataInputStream.readInt();
-            for (int i = 0; i < sizeContacts; i++) {
-                resume.addContact(ContactType.valueOf(dataInputStream.readUTF()),
-                        dataInputStream.readUTF());
-            }
-            int sizeSections = dataInputStream.readInt();
-            for (int i = 0; i < sizeSections; i++) {
+            doLoop(sizeContacts, () -> resume.addContact(ContactType.valueOf(dataInputStream.readUTF()),
+                    dataInputStream.readUTF()));
+            doLoop(dataInputStream.readInt(), () -> {
                 SectionType nameSection = SectionType.valueOf(dataInputStream.readUTF());
                 switch (nameSection) {
                     case PERSONAL:
@@ -78,18 +71,17 @@ public class DataStreamSerializer implements Serializer {
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
                         List<String> content = new ArrayList<>();
-                        addToList(dataInputStream.readInt(), content, dataInputStream::readUTF);
+                        doLoop(dataInputStream.readInt(), () -> content.add(dataInputStream.readUTF()));
                         resume.addSection(nameSection, new BulletedListSection(content));
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
-                        int sizeOrganizations = dataInputStream.readInt();
                         List<Organization> valuesOrg = new ArrayList<>();
-                        addToList(sizeOrganizations, valuesOrg, () -> readOrganization(dataInputStream));
+                        doLoop(dataInputStream.readInt(), () -> valuesOrg.add(readOrganization(dataInputStream)));
                         resume.addSection(nameSection, new OrganizationSection(valuesOrg));
                         break;
                 }
-            }
+            });
             return resume;
         }
     }
@@ -98,7 +90,7 @@ public class DataStreamSerializer implements Serializer {
         Link link = readLink(dataInputStream);
         int sizePeriods = dataInputStream.readInt();
         List<Organization.Experience> periods = new ArrayList<>();
-        addToList(sizePeriods, periods, () -> readExperience(dataInputStream));
+        doLoop(sizePeriods, () -> periods.add(readExperience(dataInputStream)));
         return new Organization(link, periods);
     }
 
@@ -109,23 +101,23 @@ public class DataStreamSerializer implements Serializer {
     }
 
     private Organization.Experience readExperience(DataInputStream dataInputStream) throws IOException {
-        LocalDate startDate = getDateFromString(dataInputStream.readUTF());
-        LocalDate endDate = getDateFromString(dataInputStream.readUTF());
+        LocalDate startDate = readDate(dataInputStream);
+        LocalDate endDate = readDate(dataInputStream);
         String title = dataInputStream.readUTF();
         return new Organization.Experience(startDate, endDate, title);
     }
 
-    private String formatDate(LocalDate localDate) {
-        return localDate.format(FORMATTER);
+    private void writeDate(DataOutputStream dataOutputStream, LocalDate localDate) throws IOException {
+        dataOutputStream.writeUTF(localDate.format(FORMATTER));
     }
 
-    private LocalDate getDateFromString(String date) {
-        return LocalDate.from(FORMATTER.parse(date));
+    private LocalDate readDate(DataInputStream dataInputStream) throws IOException {
+        return LocalDate.from(FORMATTER.parse(dataInputStream.readUTF()));
     }
 
     private void writeExperience(DataOutputStream dataOutputStream, Organization.Experience experience) throws IOException {
-        dataOutputStream.writeUTF(formatDate(experience.getStartDate()));
-        dataOutputStream.writeUTF(formatDate(experience.getEndDate()));
+        writeDate(dataOutputStream, experience.getStartDate());
+        writeDate(dataOutputStream, experience.getEndDate());
         dataOutputStream.writeUTF(experience.getTitle());
     }
 
@@ -135,14 +127,13 @@ public class DataStreamSerializer implements Serializer {
     }
 
     @FunctionalInterface
-    public interface ThrowingRunnable<T> {
-        T run() throws IOException;
+    public interface ThrowingRunnable {
+        void run() throws IOException;
     }
 
-    private <T> void addToList(int size, List<T> content,
-                               ThrowingRunnable<T> action) throws IOException {
+    private void doLoop(int size, ThrowingRunnable action) throws IOException {
         for (int j = 0; j < size; j++) {
-            content.add(action.run());
+            action.run();
         }
     }
 
