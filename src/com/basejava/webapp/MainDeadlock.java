@@ -12,16 +12,20 @@ public class MainDeadlock {
 
     private static void lockResources(Object o1, Object o2) {
         synchronized (o1) {
-            System.out.println(Thread.currentThread().getName() + " locked object " + o1.toString());
+            System.out.println(getThreadName() + " locked object " + o1.toString());
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println(Thread.currentThread().getName() + " is trying to lock object " + o2.toString());
+            System.out.println(getThreadName() + " is trying to lock object " + o2.toString());
             synchronized (o2) {
-                System.out.println(Thread.currentThread().getName() + " locked object " + o2.toString());
+                System.out.println(getThreadName() + " locked object " + o2.toString());
             }
         }
+    }
+
+    private static String getThreadName() {
+        return Thread.currentThread().getName();
     }
 }
