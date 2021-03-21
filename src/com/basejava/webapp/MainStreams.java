@@ -20,6 +20,6 @@ public class MainStreams {
     private static List<Integer> oddOrEven(List<Integer> integers) {
         Map<Boolean, List<Integer>> result = integers.stream().collect(
                 Collectors.partitioningBy(x -> x % 2 == 0));
-        return result.get(false).stream().mapToInt(Integer::intValue).sum() % 2 == 0 ? result.get(false) : result.get(true);
+        return result.get(false).size() % 2 == 0 ? result.get(false) : result.get(true);
     }
 }
