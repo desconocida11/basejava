@@ -99,6 +99,10 @@ public class ResumeTestData {
         return resume;
     }
 
+    public static Resume createPlainResume(String uuid, String fullName) {
+        return new Resume(uuid, fullName);
+    }
+
     public static void main(String[] args) {
         final Resume resume = createResume("uuid1", "Григорий Кислин");
         for (Map.Entry<ContactType, String> entry : resume.getAllContacts().entrySet()) {
