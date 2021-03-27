@@ -80,22 +80,22 @@ public class ResumeTestData {
 
     public static Resume createResume(String uuid, String fullName) {
         final Resume resume = new Resume(uuid, fullName);
-        resume.addContact(ContactType.PHONE, "+7(921)855-0482");
-        resume.addContact(ContactType.SKYPE, "grigory.kislin");
-        resume.addContact(ContactType.EMAIL, "gkislin@yandex.ru");
-        resume.addContact(ContactType.LINKEDIN, "https://www.linkedin.com/in/gkislin");
-        resume.addContact(ContactType.GITHUB, "https://github.com/gkislin");
-        resume.addContact(ContactType.STACKOVERFLOW, "https://stackoverflow.com/users/548473");
-        resume.addContact(ContactType.SITE, "http://gkislin.ru/");
-
-        resume.addSection(SectionType.PERSONAL,
-                new SingleLineSection("Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры."));
-        resume.addSection(SectionType.OBJECTIVE,
-                new SingleLineSection(OBJECTIVE));
-        resume.addSection(SectionType.ACHIEVEMENT, buildBulletedList(ACHIEVEMENT));
-        resume.addSection(SectionType.QUALIFICATIONS, buildBulletedList(QUALIFICATIONS));
-        resume.addSection(SectionType.EXPERIENCE, buildDatedSection(ORGANIZATION_S));
-        resume.addSection(SectionType.EDUCATION, buildDatedSection(EDUCATION));
+//        resume.addContact(ContactType.PHONE, "+7(921)855-0482");
+//        resume.addContact(ContactType.SKYPE, "grigory.kislin");
+//        resume.addContact(ContactType.EMAIL, "gkislin@yandex.ru");
+//        resume.addContact(ContactType.LINKEDIN, "https://www.linkedin.com/in/gkislin");
+//        resume.addContact(ContactType.GITHUB, "https://github.com/gkislin");
+//        resume.addContact(ContactType.STACKOVERFLOW, "https://stackoverflow.com/users/548473");
+//        resume.addContact(ContactType.SITE, "http://gkislin.ru/");
+//
+//        resume.addSection(SectionType.PERSONAL,
+//                new SingleLineSection("Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры."));
+//        resume.addSection(SectionType.OBJECTIVE,
+//                new SingleLineSection(OBJECTIVE));
+//        resume.addSection(SectionType.ACHIEVEMENT, buildBulletedList(ACHIEVEMENT));
+//        resume.addSection(SectionType.QUALIFICATIONS, buildBulletedList(QUALIFICATIONS));
+//        resume.addSection(SectionType.EXPERIENCE, buildDatedSection(ORGANIZATION_S));
+//        resume.addSection(SectionType.EDUCATION, buildDatedSection(EDUCATION));
         return resume;
     }
 

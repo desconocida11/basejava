@@ -1,5 +1,6 @@
 package com.basejava.webapp.sql;
 
+import com.basejava.webapp.exception.ResumeExistsStorageException;
 import com.basejava.webapp.exception.StorageException;
 
 import java.sql.Connection;
@@ -16,14 +17,17 @@ public class SqlHelper {
 
     @FunctionalInterface
     public interface ExecuteQuery<T> {
-        T execute(Connection connection, PreparedStatement statement) throws SQLException;
+        T execute(PreparedStatement statement) throws SQLException;
     }
 
-    public <T> T executeQuery(String statement, ExecuteQuery<T> action) {
+    public <T> T executeQuery(String statement, String uuid, ExecuteQuery<T> action) {
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
-            return action.execute(connection, preparedStatement);
+            return action.execute(preparedStatement);
         } catch (SQLException e) {
+            if ("23505".equals(e.getSQLState())) {
+                throw new ResumeExistsStorageException(uuid);
+            }
             throw new StorageException(e);
         }
     }

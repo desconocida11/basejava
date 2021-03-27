@@ -1,5 +1,8 @@
 package com.basejava.webapp;
 
+import com.basejava.webapp.storage.SqlStorage;
+import com.basejava.webapp.storage.Storage;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,9 +14,16 @@ public class Config {
     private static final Config INSTANCE = new Config();
     private final Properties properties = new Properties();
     private final String storageDir;
+    private static final Storage storage = new SqlStorage(INSTANCE.getProperty("db.url"),
+            INSTANCE.getProperty("db.user"),
+            INSTANCE.getProperty("db.password"));
 
     public static Config getInstance() {
         return INSTANCE;
+    }
+
+    public static Storage getStorage() {
+        return storage;
     }
 
     private Config() {
