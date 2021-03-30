@@ -15,10 +15,9 @@ public class SqlHelper {
         this.connectionFactory = connectionFactory;
     }
 
-    public <T> T executeQuery(String statement, ThrowableExecutor<T> action) {
+    private <T> T tryInConnection(SqlTransaction<T> executor) {
         try (Connection connection = connectionFactory.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(statement);
-            return action.execute(preparedStatement);
+            return executor.execute(connection);
         } catch (SQLException e) {
             if ("23505".equals(e.getSQLState())) {
                 throw new ResumeExistsStorageException(e);
@@ -27,8 +26,30 @@ public class SqlHelper {
         }
     }
 
-    @FunctionalInterface
-    public interface ThrowableExecutor<T> {
-        T execute(PreparedStatement statement) throws SQLException;
+    public <T> T executeQuery(String statement, ThrowableExecutor<T> action) {
+        return tryInConnection(connection -> {
+            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+            return action.execute(preparedStatement);
+        });
+    }
+
+    public <T> void executeInConnection(Connection connection, String statement, ThrowableExecutor<T> action) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(statement)) {
+            action.execute(ps);
+        }
+    }
+
+    public <T> T transactionalExecute(SqlTransaction<T> executor) {
+        return tryInConnection(connection -> {
+            try {
+                connection.setAutoCommit(false);
+                T result = executor.execute(connection);
+                connection.commit();
+                return result;
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            }
+        });
     }
 }

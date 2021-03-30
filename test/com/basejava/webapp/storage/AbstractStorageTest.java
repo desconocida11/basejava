@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static com.basejava.webapp.ResumeTestData.createResume;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,10 +20,10 @@ abstract class AbstractStorageTest {
     protected static final String STORAGE_DIR = Config.getInstance().getStorageDir();
 
     protected final Storage storage;
-    protected static final String UUID_1 = "uuid1";
-    protected static final String UUID_2 = "uuid2";
-    protected static final String UUID_3 = "uuid3";
-    protected static final String UUID_4 = "uuid4";
+    protected static final String UUID_1 = UUID.randomUUID().toString();
+    protected static final String UUID_2 = UUID.randomUUID().toString();
+    protected static final String UUID_3 = UUID.randomUUID().toString();
+    protected static final String UUID_4 = UUID.randomUUID().toString();
 
     public AbstractStorageTest(Storage storage) {
         this.storage = storage;
