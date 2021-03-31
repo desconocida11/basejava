@@ -89,16 +89,36 @@ public class SqlStorage implements Storage {
 
     @Override
     public void update(Resume resume) {
-        sqlHelper.executeQuery("UPDATE resume r SET full_name=? WHERE r.uuid=?",
-                preparedStatement -> {
-                    preparedStatement.setString(1, resume.getFullName());
-                    String uuid = resume.getUuid();
-                    preparedStatement.setString(2, uuid);
-                    if (preparedStatement.executeUpdate() == 0) {
-                        throw new ResumeNotExistsStorageException(uuid);
-                    }
-                    return null;
-                });
+        final String uuid = resume.getUuid();
+        sqlHelper.transactionalExecute(connection -> {
+            sqlHelper.executeInConnection(connection, "UPDATE resume r SET full_name=? WHERE r.uuid=?",
+                    (preparedStatement) -> {
+                        preparedStatement.setString(1, resume.getFullName());
+                        preparedStatement.setString(2, uuid);
+                        if (preparedStatement.executeUpdate() == 0) {
+                            throw new ResumeNotExistsStorageException(uuid);
+                        }
+                        return null;
+                    });
+            sqlHelper.executeInConnection(connection, "DELETE FROM contact WHERE resume_uuid=?",
+                    (preparedStatement)->{
+                        preparedStatement.setString(1, uuid);
+                        preparedStatement.execute();
+                        return null;
+                    });
+            sqlHelper.executeInConnection(connection, "INSERT INTO contact (type, value, resume_uuid) VALUES (?,?,?)",
+                    (preparedStatement) -> {
+                        for (Map.Entry<ContactType, String> entry : resume.getAllContacts().entrySet()) {
+                            preparedStatement.setString(1, String.valueOf(entry.getKey()));
+                            preparedStatement.setString(2, entry.getValue());
+                            preparedStatement.setString(3, uuid);
+                            preparedStatement.addBatch();
+                        }
+                        preparedStatement.executeBatch();
+                        return null;
+                    });
+            return null;
+        });
     }
 
     @Override
