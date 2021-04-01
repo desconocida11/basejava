@@ -25,6 +25,10 @@ abstract class AbstractStorageTest {
     protected static final String UUID_3 = UUID.randomUUID().toString();
     protected static final String UUID_4 = UUID.randomUUID().toString();
 
+    protected static final Resume RESUME_1 = new Resume(UUID_1, "John Dorian");
+    protected static final Resume RESUME_2 = createResume(UUID_2, "Ivan Petrov");
+    protected static final Resume RESUME_3 = createResume(UUID_3, "Petr Ivanov");
+
     public AbstractStorageTest(Storage storage) {
         this.storage = storage;
     }
@@ -32,9 +36,9 @@ abstract class AbstractStorageTest {
     @BeforeEach
     void setUp() {
         storage.clear();
-        storage.save(createResume(UUID_1, "John Dorian"));
-        storage.save(createResume(UUID_2, "Ivan Petrov"));
-        storage.save(createResume(UUID_3, "Petr Ivanov"));
+        storage.save(RESUME_1);
+        storage.save(RESUME_2);
+        storage.save(RESUME_3);
     }
 
     @Test
@@ -45,8 +49,7 @@ abstract class AbstractStorageTest {
 
     @Test
     void get() {
-        Resume resumeExpected = createResume(UUID_1, "John Dorian");
-        assertEquals(resumeExpected, storage.get(UUID_1));
+        assertEquals(RESUME_1, storage.get(UUID_1));
     }
 
     @Test
@@ -76,7 +79,7 @@ abstract class AbstractStorageTest {
 
     @Test
     void saveAlreadyExists() {
-        assertThrows(ResumeExistsStorageException.class, () -> storage.save(createResume(UUID_2, "Ivan Petrov")));
+        assertThrows(ResumeExistsStorageException.class, () -> storage.save(RESUME_2));
     }
 
     @Test
@@ -93,9 +96,8 @@ abstract class AbstractStorageTest {
 
     @Test
     void getAllSorted() {
-        List<Resume> expectedResumes = Arrays.asList(createResume(UUID_2, "Ivan Petrov"),
-                createResume(UUID_1, "John Dorian"), createResume(UUID_3, "Petr Ivanov"));
-        List<Resume> actualResumes = storage.getAllSorted();
+        List<Resume> expectedResumes = Arrays.asList(RESUME_2, RESUME_1, RESUME_3);
+        List<Resume> actualResumes =  storage.getAllSorted();
         assertEquals(expectedResumes, actualResumes);
     }
 
