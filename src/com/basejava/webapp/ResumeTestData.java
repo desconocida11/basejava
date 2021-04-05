@@ -88,21 +88,17 @@ public class ResumeTestData {
         resume.addContact(ContactType.STACKOVERFLOW, "https://stackoverflow.com/users/548473");
         resume.addContact(ContactType.SITE, "http://gkislin.ru/");
 
-/*
         resume.addSection(SectionType.PERSONAL,
                 new SingleLineSection("Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры."));
         resume.addSection(SectionType.OBJECTIVE,
                 new SingleLineSection(OBJECTIVE));
         resume.addSection(SectionType.ACHIEVEMENT, buildBulletedList(ACHIEVEMENT));
         resume.addSection(SectionType.QUALIFICATIONS, buildBulletedList(QUALIFICATIONS));
+/*
         resume.addSection(SectionType.EXPERIENCE, buildDatedSection(ORGANIZATION_S));
         resume.addSection(SectionType.EDUCATION, buildDatedSection(EDUCATION));
 */
         return resume;
-    }
-
-    public static Resume createPlainResume(String uuid, String fullName) {
-        return new Resume(uuid, fullName);
     }
 
     public static void main(String[] args) {

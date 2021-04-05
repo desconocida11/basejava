@@ -1,8 +1,7 @@
 package com.basejava.webapp.storage;
 
 import com.basejava.webapp.exception.ResumeNotExistsStorageException;
-import com.basejava.webapp.model.ContactType;
-import com.basejava.webapp.model.Resume;
+import com.basejava.webapp.model.*;
 import com.basejava.webapp.sql.SqlHelper;
 
 import java.sql.*;
@@ -38,6 +37,7 @@ public class SqlStorage implements Storage {
                         return null;
                     });
             insertContacts(connection, resume);
+            insertSections(connection, resume);
             return null;
         });
     }
@@ -59,6 +59,13 @@ public class SqlStorage implements Storage {
                 ResultSet rsContact = preparedStatement.executeQuery();
                 while (rsContact.next()) {
                     addContactToResume(resume, rsContact);
+                }
+            }
+            try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT resume_uuid AS uuid, type, value FROM section WHERE resume_uuid=?")) {
+                preparedStatement.setString(1, uuid);
+                ResultSet rsContact = preparedStatement.executeQuery();
+                while (rsContact.next()) {
+                    addSectionToResume(resume, rsContact);
                 }
             }
             return resume;
@@ -96,7 +103,14 @@ public class SqlStorage implements Storage {
                         preparedStatement.execute();
                         return null;
                     });
+            sqlHelper.executeInConnection(connection, "DELETE FROM section WHERE resume_uuid=?",
+                    preparedStatement -> {
+                        preparedStatement.setString(1, uuid);
+                        preparedStatement.execute();
+                        return null;
+                    });
             insertContacts(connection, resume);
+            insertSections(connection, resume);
             return null;
         });
     }
@@ -113,15 +127,10 @@ public class SqlStorage implements Storage {
                     resumes.put(uuid, r);
                 }
             }
-            try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT resume_uuid AS uuid, type, value FROM contact")) {
-                ResultSet rsContact = preparedStatement.executeQuery();
-                while (rsContact.next()) {
-                    String uuid = rsContact.getString("uuid");
-                    if (resumes.containsKey(uuid)) {
-                        addContactToResume(resumes.get(uuid), rsContact);
-                    }
-                }
-            }
+            sqlHelper.addSectionContact(resumes, connection, "SELECT resume_uuid AS uuid, type, value FROM contact",
+                    this::addContactToResume);
+            sqlHelper.addSectionContact(resumes, connection, "SELECT resume_uuid AS uuid, type, value FROM section",
+                    this::addSectionToResume);
             return new ArrayList<>(resumes.values());
         });
     }
@@ -149,9 +158,66 @@ public class SqlStorage implements Storage {
                 });
     }
 
+    private void insertSections(Connection connection, Resume resume) throws SQLException {
+        sqlHelper.executeInConnection(connection, "INSERT INTO section (type, value, resume_uuid) VALUES (?,?,?)",
+                preparedStatement -> {
+                    for (Map.Entry<SectionType, AbstractSection> entry : resume.getAllSections().entrySet()) {
+                        SectionType entryKey = entry.getKey();
+                        String sectionValue = null;
+                        AbstractSection abstractSection = entry.getValue();
+                        switch (entryKey) {
+                            case PERSONAL:
+                            case OBJECTIVE:
+                                sectionValue = ((SingleLineSection) abstractSection).getValue();
+                                break;
+                            case ACHIEVEMENT:
+                            case QUALIFICATIONS:
+                                StringBuilder sb = new StringBuilder();
+                                for (String s : ((BulletedListSection) abstractSection).getValue()) {
+                                    sb.append(s);
+                                    sb.append("\n");
+                                }
+                                sectionValue = sb.toString();
+                                break;
+                            case EDUCATION:
+                            case EXPERIENCE:
+                                break;
+                        }
+                        if (sectionValue != null) {
+                            preparedStatement.setString(1, String.valueOf(entryKey));
+                            preparedStatement.setString(2, sectionValue);
+                            preparedStatement.setString(3, resume.getUuid());
+                            preparedStatement.addBatch();
+                        }
+                    }
+                    preparedStatement.executeBatch();
+                    return null;
+                });
+    }
+
     private void addContactToResume(Resume resume, ResultSet resultSet) throws SQLException {
-        ContactType type = ContactType.valueOf(resultSet.getString("type"));
-        String value = resultSet.getString("value");
-        resume.addContact(type, value);
+        resume.addContact(ContactType.valueOf(resultSet.getString("type")), resultSet.getString("value"));
+    }
+
+    private void addSectionToResume(Resume resume, ResultSet resultSet) throws SQLException {
+        SectionType type = SectionType.valueOf(resultSet.getString("type"));
+        AbstractSection abstractSection = null;
+        String sectionValue = resultSet.getString("value");
+        switch (type) {
+            case PERSONAL:
+            case OBJECTIVE:
+                abstractSection = new SingleLineSection(sectionValue);
+                break;
+            case ACHIEVEMENT:
+            case QUALIFICATIONS:
+                abstractSection = new BulletedListSection(sectionValue.split("\n"));
+                break;
+            case EDUCATION:
+            case EXPERIENCE:
+                break;
+        }
+        if (abstractSection != null) {
+            resume.addSection(type, abstractSection);
+        }
     }
 }
