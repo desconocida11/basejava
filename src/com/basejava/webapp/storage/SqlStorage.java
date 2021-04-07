@@ -16,6 +16,11 @@ public class SqlStorage implements Storage {
 
     public SqlStorage(String dbUrl, String dbUser, String dbPassword) {
         sqlHelper = new SqlHelper(() -> DriverManager.getConnection(dbUrl, dbUser, dbPassword));
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("No driver found for PostgreSQL database", e);
+        }
     }
 
     @SuppressWarnings("SqlWithoutWhere")
