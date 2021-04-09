@@ -4,6 +4,7 @@ import com.basejava.webapp.Config;
 import com.basejava.webapp.model.Resume;
 import com.basejava.webapp.storage.Storage;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,13 @@ import java.nio.charset.StandardCharsets;
 
 public class ResumeServlet extends HttpServlet {
 
+    private Storage storage;
+
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        storage = Config.getStorage();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -21,8 +29,7 @@ public class ResumeServlet extends HttpServlet {
         String name = request.getParameter("name");
         response.getWriter().write(name == null ? "Hello, Resumes!" : "Hello, " + name + "!");
         response.getWriter().write("<table>");
-        final Storage ARRAY_STORAGE = Config.getStorage();
-        for (Resume resume : ARRAY_STORAGE.getAllSorted()) {
+        for (Resume resume : storage.getAllSorted()) {
             response.getWriter().write("<tr>");
             response.getWriter().write("<td>" + resume.getUuid() + "</td>" + "<td>" + resume.getFullName() + "</td>");
             response.getWriter().write("</tr>");

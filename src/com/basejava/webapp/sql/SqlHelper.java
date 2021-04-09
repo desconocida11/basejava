@@ -2,13 +2,10 @@ package com.basejava.webapp.sql;
 
 import com.basejava.webapp.exception.ResumeExistsStorageException;
 import com.basejava.webapp.exception.StorageException;
-import com.basejava.webapp.model.Resume;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 
 public class SqlHelper {
 
@@ -55,17 +52,4 @@ public class SqlHelper {
             }
         });
     }
-
-    public void addSectionContact(Map<String, Resume> resumes, Connection connection, String query, ThrowableAddition adder) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            ResultSet rsSection = preparedStatement.executeQuery();
-            while (rsSection.next()) {
-                String uuid = rsSection.getString("uuid");
-                if (resumes.containsKey(uuid)) {
-                    adder.execute(resumes.get(uuid), rsSection);
-                }
-            }
-        }
-    }
-
 }

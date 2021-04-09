@@ -3,6 +3,7 @@ package com.basejava.webapp.storage;
 import com.basejava.webapp.exception.ResumeNotExistsStorageException;
 import com.basejava.webapp.model.*;
 import com.basejava.webapp.sql.SqlHelper;
+import com.basejava.webapp.sql.ThrowableAddition;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -132,9 +133,9 @@ public class SqlStorage implements Storage {
                     resumes.put(uuid, r);
                 }
             }
-            sqlHelper.addSectionContact(resumes, connection, "SELECT resume_uuid AS uuid, type, value FROM contact",
+            addSectionContact(resumes, connection, "SELECT resume_uuid AS uuid, type, value FROM contact",
                     this::addContactToResume);
-            sqlHelper.addSectionContact(resumes, connection, "SELECT resume_uuid AS uuid, type, value FROM section",
+            addSectionContact(resumes, connection, "SELECT resume_uuid AS uuid, type, value FROM section",
                     this::addSectionToResume);
             return new ArrayList<>(resumes.values());
         });
@@ -177,12 +178,7 @@ public class SqlStorage implements Storage {
                                 break;
                             case ACHIEVEMENT:
                             case QUALIFICATIONS:
-                                StringBuilder sb = new StringBuilder();
-                                for (String s : ((BulletedListSection) abstractSection).getValue()) {
-                                    sb.append(s);
-                                    sb.append("\n");
-                                }
-                                sectionValue = sb.toString();
+                                sectionValue = String.join("\n", ((BulletedListSection) abstractSection).getValue());
                                 break;
                             case EDUCATION:
                             case EXPERIENCE:
@@ -198,6 +194,18 @@ public class SqlStorage implements Storage {
                     preparedStatement.executeBatch();
                     return null;
                 });
+    }
+
+    private void addSectionContact(Map<String, Resume> resumes, Connection connection, String query, ThrowableAddition adder) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            ResultSet rsSection = preparedStatement.executeQuery();
+            while (rsSection.next()) {
+                String uuid = rsSection.getString("uuid");
+                if (resumes.containsKey(uuid)) {
+                    adder.execute(resumes.get(uuid), rsSection);
+                }
+            }
+        }
     }
 
     private void addContactToResume(Resume resume, ResultSet resultSet) throws SQLException {
