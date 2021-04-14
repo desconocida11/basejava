@@ -4,6 +4,7 @@ import com.basejava.webapp.exception.ResumeNotExistsStorageException;
 import com.basejava.webapp.model.*;
 import com.basejava.webapp.sql.SqlHelper;
 import com.basejava.webapp.sql.ThrowableAddition;
+import com.basejava.webapp.util.JsonParser;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class SqlStorage implements Storage {
                         return null;
                     });
             insertContacts(connection, resume);
-            insertSections(connection, resume);
+            insertSectionsJson(connection, resume);
             return null;
         });
     }
@@ -71,7 +72,7 @@ public class SqlStorage implements Storage {
                 preparedStatement.setString(1, uuid);
                 ResultSet rsContact = preparedStatement.executeQuery();
                 while (rsContact.next()) {
-                    addSectionToResume(resume, rsContact);
+                    addSectionToResumeJson(resume, rsContact);
                 }
             }
             return resume;
@@ -103,20 +104,10 @@ public class SqlStorage implements Storage {
                         }
                         return null;
                     });
-            sqlHelper.executeInConnection(connection, "DELETE FROM contact WHERE resume_uuid=?",
-                    preparedStatement -> {
-                        preparedStatement.setString(1, uuid);
-                        preparedStatement.execute();
-                        return null;
-                    });
-            sqlHelper.executeInConnection(connection, "DELETE FROM section WHERE resume_uuid=?",
-                    preparedStatement -> {
-                        preparedStatement.setString(1, uuid);
-                        preparedStatement.execute();
-                        return null;
-                    });
+            deleteAttributes(connection, "DELETE FROM contact WHERE resume_uuid=?", uuid);
+            deleteAttributes(connection, "DELETE FROM section WHERE resume_uuid=?", uuid);
             insertContacts(connection, resume);
-            insertSections(connection, resume);
+            insertSectionsJson(connection, resume);
             return null;
         });
     }
@@ -136,7 +127,7 @@ public class SqlStorage implements Storage {
             addSectionContact(resumes, connection, "SELECT resume_uuid AS uuid, type, value FROM contact",
                     this::addContactToResume);
             addSectionContact(resumes, connection, "SELECT resume_uuid AS uuid, type, value FROM section",
-                    this::addSectionToResume);
+                    this::addSectionToResumeJson);
             return new ArrayList<>(resumes.values());
         });
     }
@@ -156,6 +147,23 @@ public class SqlStorage implements Storage {
                     for (Map.Entry<ContactType, String> entry : resume.getAllContacts().entrySet()) {
                         preparedStatement.setString(1, String.valueOf(entry.getKey()));
                         preparedStatement.setString(2, entry.getValue());
+                        preparedStatement.setString(3, resume.getUuid());
+                        preparedStatement.addBatch();
+                    }
+                    preparedStatement.executeBatch();
+                    return null;
+                });
+    }
+
+    private void insertSectionsJson(Connection connection, Resume resume) throws SQLException {
+        sqlHelper.executeInConnection(connection, "INSERT INTO section (type, value, resume_uuid) VALUES (?,?,?)",
+                preparedStatement -> {
+                    for (Map.Entry<SectionType, AbstractSection> entry : resume.getAllSections().entrySet()) {
+                        SectionType entryKey = entry.getKey();
+                        AbstractSection section = entry.getValue();
+                        String sectionValue = JsonParser.write(section, AbstractSection.class);
+                        preparedStatement.setString(1, String.valueOf(entryKey));
+                        preparedStatement.setString(2, sectionValue);
                         preparedStatement.setString(3, resume.getUuid());
                         preparedStatement.addBatch();
                     }
@@ -232,5 +240,20 @@ public class SqlStorage implements Storage {
         if (abstractSection != null) {
             resume.addSection(type, abstractSection);
         }
+    }
+
+    private void addSectionToResumeJson(Resume resume, ResultSet resultSet) throws SQLException {
+        SectionType type = SectionType.valueOf(resultSet.getString("type"));
+        AbstractSection abstractSection = JsonParser.read(resultSet.getString("value"), AbstractSection.class);
+        resume.addSection(type, abstractSection);
+    }
+
+    private void deleteAttributes(Connection connection, String query, String uuid) throws SQLException {
+        sqlHelper.executeInConnection(connection, query,
+                preparedStatement -> {
+                    preparedStatement.setString(1, uuid);
+                    preparedStatement.execute();
+                    return null;
+                });
     }
 }

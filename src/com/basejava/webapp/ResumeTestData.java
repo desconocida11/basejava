@@ -6,13 +6,22 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 public class ResumeTestData {
 
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
 
-    private static final List<String> ACHIEVEMENT = Arrays.asList(
+    public static final String UUID_1 = UUID.randomUUID().toString();
+    public static final String UUID_2 = UUID.randomUUID().toString();
+    public static final String UUID_3 = UUID.randomUUID().toString();
+    public static final String UUID_4 = UUID.randomUUID().toString();
+
+    public static final Resume RESUME_1;
+    public static final Resume RESUME_2;
+    public static final Resume RESUME_3;
+
+    public static final List<String> ACHIEVEMENT = Arrays.asList(
             "С 2013 года: разработка проектов \"Разработка Web приложения\",\"Java Enterprise\", \"Многомодульный maven. Многопоточность. XML (JAXB/StAX). Веб сервисы (JAX-RS/SOAP). Удаленное взаимодействие (JMS/AKKA)\". Организация онлайн стажировок и ведение проектов. Более 1000 выпускников.",
             "Реализация двухфакторной аутентификации для онлайн платформы управления проектами Wrike. Интеграция с Twilio, DuoSecurity, Google Authenticator, Jira, Zendesk.",
             "Налаживание процесса разработки и непрерывной интеграции ERP системы River BPM. Интеграция с 1С, Bonita BPM, CMIS, LDAP. Разработка приложения управления окружением на стеке: Scala/Play/Anorm/JQuery. Разработка SSO аутентификации и авторизации различных ERP модулей, интеграция CIFS/SMB java сервера.",
@@ -20,7 +29,7 @@ public class ResumeTestData {
             "Создание JavaEE фреймворка для отказоустойчивого взаимодействия слабо-связанных сервисов (SOA-base архитектура, JAX-WS, JMS, AS Glassfish). Сбор статистики сервисов и информации о состоянии через систему мониторинга Nagios. Реализация онлайн клиента для администрирования и мониторинга системы по JMX (Jython/ Django).",
             "Реализация протоколов по приему платежей всех основных платежных системы России (Cyberplat, Eport, Chronopay, Сбербанк), Белоруcсии(Erip, Osmp) и Никарагуа.");
 
-    private static final List<String> QUALIFICATIONS = Arrays.asList(
+    public static final List<String> QUALIFICATIONS = Arrays.asList(
             "JEE AS: GlassFish (v2.1, v3), OC4J, JBoss, Tomcat, Jetty, WebLogic, WSO2",
             "Version control: Subversion, Git, Mercury, ClearCase, Perforce",
             "DB: PostgreSQL(наследование, pgplsql, PL/Python), Redis (Jedis), H2, Oracle,",
@@ -37,15 +46,15 @@ public class ResumeTestData {
             "Отличное знание и опыт применения концепций ООП, SOA, шаблонов проектрирования, архитектурных шаблонов, UML, функционального программирования",
             "Родной русский, английский \"upper intermediate\"");
 
-    private static final String OBJECTIVE = "Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям";
+    public static final String OBJECTIVE = "Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям";
 
-    private static Organization.Experience fillOrganizationPeriod(String startDate, String endDate, String value) {
+    public static Organization.Experience fillOrganizationPeriod(String startDate, String endDate, String value) {
         LocalDate start = LocalDate.parse(("01/" + startDate), formatter);
         LocalDate end = LocalDate.parse(("01/" + endDate), formatter);
         return new Organization.Experience(start, end, value);
     }
 
-    private static final List<Organization> ORGANIZATION_S = Arrays.asList(
+    public static final List<Organization> ORGANIZATION_S = Arrays.asList(
             new Organization(new Link("Alcatel"),
                     Arrays.asList(fillOrganizationPeriod("09/1997", "01/2005", "Инженер по аппаратному и программному тестированию\n" +
                             "Тестирование, отладка, внедрение ПО цифровой телефонной станции Alcatel 1000 S12 (CHILL, ASM)."))),
@@ -70,11 +79,20 @@ public class ResumeTestData {
             new Organization(new Link("Coursera"), Arrays.asList(fillOrganizationPeriod("03/2013", "05/2013", "\"Functional Programming Principles in Scala\" by Martin Odersky")))
     );
 
-    private static AbstractSection buildBulletedList(List<String> content) {
+    static {
+        RESUME_1 = new Resume(UUID_1, "John Dorian");
+        RESUME_2 = createResume(UUID_2, "Ivan Petrov");
+        RESUME_3 = createResume(UUID_3, "Petr Ivanov");
+    }
+
+    public ResumeTestData() {
+    }
+
+    public static AbstractSection buildBulletedList(List<String> content) {
         return new BulletedListSection(content);
     }
 
-    private static AbstractSection buildDatedSection(List<Organization> organizations) {
+    public static AbstractSection buildDatedSection(List<Organization> organizations) {
         return new OrganizationSection(organizations);
     }
 
@@ -94,21 +112,8 @@ public class ResumeTestData {
                 new SingleLineSection(OBJECTIVE));
         resume.addSection(SectionType.ACHIEVEMENT, buildBulletedList(ACHIEVEMENT));
         resume.addSection(SectionType.QUALIFICATIONS, buildBulletedList(QUALIFICATIONS));
-/*
         resume.addSection(SectionType.EXPERIENCE, buildDatedSection(ORGANIZATION_S));
         resume.addSection(SectionType.EDUCATION, buildDatedSection(EDUCATION));
-*/
         return resume;
-    }
-
-    public static void main(String[] args) {
-        final Resume resume = createResume("uuid1", "Григорий Кислин");
-        for (Map.Entry<ContactType, String> entry : resume.getAllContacts().entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
-
-        for (Map.Entry<SectionType, AbstractSection> entry : resume.getAllSections().entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
     }
 }
