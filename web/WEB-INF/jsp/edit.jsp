@@ -1,5 +1,7 @@
 <%@ page import="com.basejava.webapp.model.ContactType" %>
 <%@ page import="com.basejava.webapp.model.SectionType" %>
+<%@ page import="com.basejava.webapp.model.BulletedListSection" %>
+<%@ page import="java.util.Collections" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
@@ -33,14 +35,24 @@
         <hr>
 
         <c:forEach var="section" items="<%=SectionType.values()%>">
+            <jsp:useBean id="section" type="com.basejava.webapp.model.SectionType"/>
             <c:set var="key" value="${section.name()}"/>
             <c:choose>
-                <c:when test="${key eq 'PERSONAL'}">
+                <c:when test="${(key eq 'OBJECTIVE') || (key eq 'PERSONAL')}">
                     <dl>
                         <dt>${section.title}</dt>
                         <dd><label>
-                            <input type="text" name="${section.name()}" size="200" height="30"
-                                       value="${resume.getSectionByType(section)}">
+                            <input type="text" name="${key}" size="200" height="30"
+                                   value="${resume.getSectionByType(section)}">
+                        </label>
+                        </dd>
+                    </dl>
+                </c:when>
+                <c:when test="${(key eq 'ACHIEVEMENT') || (key eq 'QUALIFICATIONS')}">
+                    <dl>
+                        <dt>${section.title}</dt>
+                        <dd><label>
+                            <textarea name="${key}" rows="10" cols="150"><%=String.join("\n", resume.getSectionByType(section) == null ? Collections.EMPTY_LIST : ((BulletedListSection) resume.getSectionByType(section)).getValue())%></textarea>
                         </label>
                         </dd>
                     </dl>

@@ -70,8 +70,6 @@
                             </tr>
                         </c:forEach>
                     </table>
-
-
                 </c:forEach>
             </c:when>
 
@@ -79,8 +77,6 @@
                 <%-- Statements which gets executed when all <c:when> tests are false.  --%>
             </c:otherwise>
         </c:choose>
-
-
     </c:forEach>
 
 </section>

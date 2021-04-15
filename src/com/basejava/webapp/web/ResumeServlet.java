@@ -1,10 +1,7 @@
 package com.basejava.webapp.web;
 
 import com.basejava.webapp.Config;
-import com.basejava.webapp.model.ContactType;
-import com.basejava.webapp.model.Resume;
-import com.basejava.webapp.model.SectionType;
-import com.basejava.webapp.model.SingleLineSection;
+import com.basejava.webapp.model.*;
 import com.basejava.webapp.storage.Storage;
 
 import javax.servlet.ServletConfig;
@@ -14,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class ResumeServlet extends HttpServlet {
 
@@ -51,7 +49,6 @@ public class ResumeServlet extends HttpServlet {
                 throw new IllegalArgumentException("Action " + action + " is illegal");
         }
         request.setAttribute("resume", r);
-        request.setAttribute("allSections", r.getAllSections());
 
         request.getRequestDispatcher("view".equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp")
                 .forward(request, response);
@@ -88,6 +85,8 @@ public class ResumeServlet extends HttpServlet {
                         break;
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
+                        String[] section = Arrays.stream(value.trim().split("\n")).filter(s->s.trim().length() > 0).toArray(String[]::new);
+                        resume.addSection(type, new BulletedListSection(section));
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
