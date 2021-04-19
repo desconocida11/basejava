@@ -11,9 +11,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class ResumeServlet extends HttpServlet {
+
+    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-d");
 
     private Storage storage;
 
@@ -75,9 +82,44 @@ public class ResumeServlet extends HttpServlet {
                 resume.getAllContacts().remove(type);
             }
         }
+        Map<String, String[]> values = request.getParameterMap();
         for (SectionType type : SectionType.values()) {
-            String value = request.getParameter(type.name());
+            boolean typeExists = false;
+            String typeName = type.name();
+            String value = request.getParameter(typeName);
+            List<Organization> organizations = null;
             if (value != null && value.trim().length() != 0) {
+                typeExists = true;
+            } else {
+                organizations = new ArrayList<>();
+                for (Map.Entry<String, String[]> entry : values.entrySet()) {
+                    if (entry.getKey().startsWith(typeName)) {
+                        String[] entryValue = entry.getValue();
+                        Link link;
+                        if (entryValue[1].equals("")) {
+                            link = new Link(entryValue[0]);
+                        } else {
+                            link = new Link(entryValue[0], entryValue[1]);
+                        }
+                        List<Organization.Experience> periods = new ArrayList<>();
+                        for (int i = 0; i < entryValue.length - 2; i += 3) {
+                            LocalDate startDate = LocalDate.parse((entryValue[2 + i] + "-01"), formatter);
+                            LocalDate endDate = LocalDate.parse((entryValue[3 + i] + "-01"), formatter);
+                            String title = entryValue[4 + i];
+                            if (startDate != null && endDate != null && title != null && title.trim().length() > 0) {
+                                periods.add(new Organization.Experience(startDate, endDate, title));
+                            }
+                        }
+                        if (!periods.isEmpty()) {
+                            organizations.add(new Organization(link, periods));
+                        }
+                    }
+                }
+                if (!organizations.isEmpty()) {
+                    typeExists = true;
+                }
+            }
+            if (typeExists) {
                 switch (type) {
                     case PERSONAL:
                     case OBJECTIVE:
@@ -85,11 +127,12 @@ public class ResumeServlet extends HttpServlet {
                         break;
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
-                        String[] section = Arrays.stream(value.trim().split("\n")).filter(s->s.trim().length() > 0).toArray(String[]::new);
+                        String[] section = Arrays.stream(value.trim().split("\n")).filter(s -> s.trim().length() > 0).toArray(String[]::new);
                         resume.addSection(type, new BulletedListSection(section));
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
+                        resume.addSection(type, new OrganizationSection(organizations));
                         break;
                 }
             } else {

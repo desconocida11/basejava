@@ -64,8 +64,10 @@
                                         ${period.startDate.monthValue}/${period.startDate.year}
                                     - ${period.endDate.monthValue}/${period.endDate.year}
                                 </td>
-                                <td>
-                                        ${period.title}
+                                <td><label>
+                                    <textarea readonly rows="3" cols="120"
+                                              style="align-content: center; border: hidden;">${period.title}</textarea>
+                                </label>
                                 </td>
                             </tr>
                         </c:forEach>
