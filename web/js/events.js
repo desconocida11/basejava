@@ -1,3 +1,38 @@
+function addPosition(posTable, key) {
+
+    var keyInt = key;
+
+    var tableRef = document.getElementById(posTable);
+    var newRow = tableRef.insertRow();
+
+    var newCell = newRow.insertCell(0);
+    var newElem = document.createElement('input');
+    newElem.setAttribute("name", keyInt);
+    newElem.setAttribute("type", "month");
+    newCell.appendChild(newElem);
+
+    newCell = newRow.insertCell(1);
+    newElem = document.createElement('input');
+    newElem.setAttribute("name", keyInt);
+    newElem.setAttribute("type", "month");
+    newCell.appendChild(newElem);
+
+    newCell = newRow.insertCell(2);
+    newElem = document.createElement('textarea');
+    newElem.setAttribute("name", keyInt);
+    newElem.setAttribute("rows", "2");
+    newElem.setAttribute("cols", "50");
+    newCell.appendChild(newElem);
+
+    newCell = newRow.insertCell(3);
+    newElem = document.createElement('input');
+    newElem.setAttribute("id", "delPos");
+    newElem.setAttribute("value", "Удалить поз.");
+    newElem.setAttribute("type", "button");
+    newElem.setAttribute("onClick", "SomeDeleteRowFunction(this)")
+    newCell.appendChild(newElem);
+}
+
 function addOrganization(orgTable, key, rows) {
 
     var keyInt = key + '.' + rows;
@@ -44,8 +79,9 @@ function addOrganization(orgTable, key, rows) {
 
     newCell = newRow.insertCell(3);
     newElem = document.createElement('input');
-    newElem.setAttribute("value", "Удалить организацию");
-    newElem.setAttribute("type", "button");
+    newElem.setAttribute("id", "delOrg");
+    newElem.setAttribute("src", "img/delete.png");
+    newElem.setAttribute("type", "image");
     newElem.setAttribute("onClick", "SomeDeleteRowFunction(this)")
     newCell.appendChild(newElem);
 }

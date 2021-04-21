@@ -102,7 +102,7 @@
                                 </td>
 
                                 <td>
-                                    <table id="periods${key}">
+                                    <table id="periods${key}.${counter}">
                                         <c:forEach items="${organization.periods}" var="period">
                                             <jsp:useBean id="period"
                                                          type="com.basejava.webapp.model.Organization.Experience"/>
@@ -125,14 +125,23 @@
                                                                   cols="50"><%=period.getTitle()%></textarea>
                                                     </label>
                                                 </td>
+                                                <td width="10%">
+                                                    <input type="button" id="delPos" value="Удалить поз."
+                                                           onclick="SomeDeleteRowFunction(this)">
+                                                </td>
                                             </tr>
                                         </c:forEach>
                                     </table>
+
+                                    <button type="button" id="addPos"
+                                            onclick="addPosition('periods${key}.${counter}', '${key}.${counter}');">
+                                        Добавить позицию
+                                    </button>
                                 </td>
 
                                 <td>
-                                    <input type="button" value="Удалить организацию"
-                                           onclick="SomeDeleteRowFunction(this)"/>
+                                    <input type="image" id="delOrg" src="img/delete.png"
+                                           onclick="SomeDeleteRowFunction(this)">
                                 </td>
                             </tr>
                         </c:forEach>

@@ -20,6 +20,24 @@
         <c:forEach var="contactEntry" items="${resume.allContacts}">
             <jsp:useBean id="contactEntry"
                          type="java.util.Map.Entry<com.basejava.webapp.model.ContactType, java.lang.String>"/>
+            <c:set var="contactType" value="${contactEntry.key}"/>
+            <c:choose>
+                <c:when test="${contactType eq 'SKYPE'}">
+                    <img src="img/skype.png" alt="skype">
+                </c:when>
+                <c:when test="${contactType eq 'EMAIL'}">
+                    <img src="img/email.png" alt="skype">
+                </c:when>
+                <c:when test="${contactType eq 'GITHUB'}">
+                    <img src="img/gh.png" alt="skype">
+                </c:when>
+                <c:when test="${contactType eq 'LINKEDIN'}">
+                    <img src="img/lin.png" alt="skype">
+                </c:when>
+                <c:when test="${contactType eq 'STACKOVERFLOW'}">
+                    <img src="img/so.png" alt="skype">
+                </c:when>
+            </c:choose>
             <%=contactEntry.getKey().toHtml(contactEntry.getValue())%><br/>
         </c:forEach>
     </p>
