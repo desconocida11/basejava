@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -103,8 +104,8 @@ public class ResumeServlet extends HttpServlet {
                         }
                         List<Organization.Experience> periods = new ArrayList<>();
                         for (int i = 0; i < entryValue.length - 2; i += 3) {
-                            LocalDate startDate = LocalDate.parse((entryValue[2 + i] + "-01"), formatter);
-                            LocalDate endDate = LocalDate.parse((entryValue[3 + i] + "-01"), formatter);
+                            LocalDate startDate = parseInputDate(entryValue[2 + i]);
+                            LocalDate endDate = parseInputDate(entryValue[3 + i]);
                             String title = entryValue[4 + i];
                             if (startDate != null && endDate != null && title != null && title.trim().length() > 0) {
                                 periods.add(new Organization.Experience(startDate, endDate, title));
@@ -145,5 +146,15 @@ public class ResumeServlet extends HttpServlet {
             storage.update(resume);
         }
         response.sendRedirect("resume");
+    }
+
+    private LocalDate parseInputDate(String input) {
+        LocalDate parsedDate;
+        try {
+            parsedDate = LocalDate.parse((input + "-01"), formatter);
+        } catch (DateTimeParseException exception) {
+            return null;
+        }
+        return parsedDate;
     }
 }
