@@ -10,6 +10,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" href="css/style.css">
     <script rel="script" src="js/events.js"></script>
+    <script>
+        var rows = 0;
+    </script>
     <jsp:useBean id="resume" type="com.basejava.webapp.model.Resume" scope="request"/>
     <title>Edit resume ${resume.fullName}</title>
 </head>
@@ -82,6 +85,9 @@
                             <jsp:useBean id="organization" type="com.basejava.webapp.model.Organization"/>
                             <tr>
                                 <c:set var="counter" value="${counter + 1}" scope="request"/>
+                                <script>
+                                    rows = rows + 1;
+                                </script>
                                 <td>
                                     <label>
                                         <input type="text" name="${key}.${counter}"
@@ -133,7 +139,7 @@
                     </table>
 
                     <button type="button" id="addOrg"
-                            onclick="addOrganization('organization${key}', '${key}.${counter+1}');">
+                            onclick="rows = rows + 1;addOrganization('organization${key}',  '${key}', rows);">
                         Добавить организацию
                     </button>
                 </c:otherwise>
