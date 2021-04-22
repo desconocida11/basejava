@@ -14,10 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ResumeServlet extends HttpServlet {
 
@@ -83,7 +81,11 @@ public class ResumeServlet extends HttpServlet {
                 resume.getAllContacts().remove(type);
             }
         }
-        Map<String, String[]> values = request.getParameterMap();
+
+        Set<Map.Entry<String, String[]>> values = request.getParameterMap().entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().startsWith(SectionType.EXPERIENCE.name()) || entry.getKey().startsWith(SectionType.EDUCATION.name()))
+                .collect(Collectors.toSet());
         for (SectionType type : SectionType.values()) {
             boolean typeExists = false;
             String typeName = type.name();
@@ -93,9 +95,10 @@ public class ResumeServlet extends HttpServlet {
                 typeExists = true;
             } else {
                 organizations = new ArrayList<>();
-                for (Map.Entry<String, String[]> entry : values.entrySet()) {
-                    if (entry.getKey().startsWith(typeName)) {
+                for (Map.Entry<String, String[]> entry : values) {
+                    if (entry.getKey().startsWith(typeName) && entry.getValue().length >= 5) {
                         String[] entryValue = entry.getValue();
+                        int valuesLength = entryValue.length;
                         Link link;
                         if (entryValue[1].equals("")) {
                             link = new Link(entryValue[0]);
@@ -103,11 +106,11 @@ public class ResumeServlet extends HttpServlet {
                             link = new Link(entryValue[0], entryValue[1]);
                         }
                         List<Organization.Experience> periods = new ArrayList<>();
-                        for (int i = 0; i < entryValue.length - 2; i += 3) {
+                        for (int i = 0; i < valuesLength - 2; i += 3) {
                             LocalDate startDate = parseInputDate(entryValue[2 + i]);
                             LocalDate endDate = parseInputDate(entryValue[3 + i]);
                             String title = entryValue[4 + i];
-                            if (startDate != null && endDate != null && title != null && title.trim().length() > 0) {
+                            if (startDate != null && endDate != null && (!isEmpty(title))) {
                                 periods.add(new Organization.Experience(startDate, endDate, title));
                             }
                         }
@@ -140,12 +143,16 @@ public class ResumeServlet extends HttpServlet {
                 resume.getAllSections().remove(type);
             }
         }
-        if (uuid == null || uuid.trim().length() == 0) {
+        if (isEmpty(uuid)) {
             storage.save(resume);
         } else {
             storage.update(resume);
         }
         response.sendRedirect("resume");
+    }
+
+    private boolean isEmpty(String input) {
+        return input == null || input.trim().length() == 0;
     }
 
     private LocalDate parseInputDate(String input) {

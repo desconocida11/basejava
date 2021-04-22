@@ -26,16 +26,16 @@
                     <img src="img/skype.png" alt="skype">
                 </c:when>
                 <c:when test="${contactType eq 'EMAIL'}">
-                    <img src="img/email.png" alt="skype">
+                    <img src="img/email.png" alt="email">
                 </c:when>
                 <c:when test="${contactType eq 'GITHUB'}">
-                    <img src="img/gh.png" alt="skype">
+                    <img src="img/gh.png" alt="github">
                 </c:when>
                 <c:when test="${contactType eq 'LINKEDIN'}">
-                    <img src="img/lin.png" alt="skype">
+                    <img src="img/lin.png" alt="linkedin">
                 </c:when>
                 <c:when test="${contactType eq 'STACKOVERFLOW'}">
-                    <img src="img/so.png" alt="skype">
+                    <img src="img/so.png" alt="stackoverflow">
                 </c:when>
             </c:choose>
             <%=contactEntry.getKey().toHtml(contactEntry.getValue())%><br/>

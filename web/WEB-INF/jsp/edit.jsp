@@ -140,7 +140,7 @@
                                 </td>
 
                                 <td>
-                                    <input type="image" id="delOrg" src="img/delete.png"
+                                    <input type="image" id="delOrg" src="img/delete.png" alt="Удалить организацию"
                                            onclick="SomeDeleteRowFunction(this)">
                                 </td>
                             </tr>
